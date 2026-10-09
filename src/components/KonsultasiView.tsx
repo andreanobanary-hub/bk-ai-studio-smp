@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { SchoolProfile, CaseAnalysis } from '../types';
+import React, { useState, useEffect } from 'react';
+import { SchoolProfile, CaseAnalysis, CounselingCaseEntry } from '../types';
 import { PRESET_KASUS_KONSELOR } from '../data/constants';
 import { consultCaseClient, getActiveApiKey } from '../services/geminiClient';
+import { loadCaseEntries, saveCaseEntries } from '../services/storageService';
 import {
   MessageSquareHeart,
   Sparkles,
@@ -15,6 +16,11 @@ import {
   AlertCircle,
   HelpCircle,
   CheckCircle2,
+  Bookmark,
+  Trash2,
+  FolderOpen,
+  Calendar,
+  Save,
 } from 'lucide-react';
 
 interface KonsultasiViewProps {
@@ -28,7 +34,11 @@ export const KonsultasiView: React.FC<KonsultasiViewProps> = ({
   onShowToast,
   onOpenApiKeyModal,
 }) => {
-  const [kelas, setKelas] = useState<string>('Kelas 8 SMP');
+  const [activeSubTab, setActiveSubTab] = useState<'consultation' | 'case_log'>('consultation');
+
+  // Active Case Inputs
+  const [namaInisial, setNamaInisial] = useState<string>('AM (Siswi)');
+  const [kelas, setKelas] = useState<string>('Kelas 7 SMP');
   const [bidang, setBidang] = useState<string>('Sosial');
   const [fokus, setFokus] = useState<string>('Konseling Individual & Mediasi Sebaya');
   const [kasus, setKasus] = useState<string>(
@@ -84,11 +94,21 @@ export const KonsultasiView: React.FC<KonsultasiViewProps> = ({
       'Patuhi asas kerahasiaan Kode Etik ABKIN. Jangan pernah membocorkan curhatan konseli kepada siswa lain atau di ruang guru umum. Fokus pada pemulihan harga diri konseli.',
   });
 
+  // Persistent Case Entries Log
+  const [caseEntries, setCaseEntries] = useState<CounselingCaseEntry[]>(() => loadCaseEntries());
+  const [statusPenanganan, setStatusPenanganan] = useState<CounselingCaseEntry['statusPenanganan']>('Proses Konseling');
+  const [catatanTindakLanjut, setCatatanTindakLanjut] = useState<string>('Sesi konseling awal berjalan kondusif. Menunggu mediasi.');
+
+  useEffect(() => {
+    saveCaseEntries(caseEntries);
+  }, [caseEntries]);
+
   const handleApplyPreset = (item: typeof PRESET_KASUS_KONSELOR[0]) => {
     setKasus(item.deskripsi);
     setKelas(item.kelas);
     setBidang(item.bidang);
     setFokus(item.fokus);
+    setNamaInisial(item.judul.split(' ')[2] || 'Siswa SMP');
     onShowToast(`Kasus "${item.judul.slice(0, 30)}..." dimuat!`);
   };
 
@@ -122,13 +142,56 @@ export const KonsultasiView: React.FC<KonsultasiViewProps> = ({
     }
   };
 
+  const handleSaveToCaseLog = () => {
+    if (!analysis) {
+      onShowToast('Belum ada analisis kasus untuk disimpan.');
+      return;
+    }
+
+    const newEntry: CounselingCaseEntry = {
+      id: `case-${Date.now()}`,
+      tanggal: new Date().toISOString().split('T')[0],
+      namaSiswaInisial: namaInisial.trim() || 'Inisial Siswa',
+      kelas,
+      bidang,
+      fokus,
+      deskripsiKasus: kasus,
+      analysis,
+      statusPenanganan,
+      catatanTindakLanjut,
+    };
+
+    setCaseEntries((prev) => [newEntry, ...prev]);
+    onShowToast(`Kasus "${newEntry.namaSiswaInisial}" berhasil dicatat ke Buku Kasus Konselor!`);
+  };
+
+  const handleLoadSavedCase = (entry: CounselingCaseEntry) => {
+    setNamaInisial(entry.namaSiswaInisial);
+    setKelas(entry.kelas);
+    setBidang(entry.bidang);
+    setFokus(entry.fokus);
+    setKasus(entry.deskripsiKasus);
+    setAnalysis(entry.analysis);
+    setStatusPenanganan(entry.statusPenanganan);
+    setCatatanTindakLanjut(entry.catatanTindakLanjut || '');
+    setActiveSubTab('consultation');
+    onShowToast(`Kasus "${entry.namaSiswaInisial}" dimuat kembali!`);
+  };
+
+  const handleDeleteSavedCase = (id: string) => {
+    setCaseEntries((prev) => prev.filter((c) => c.id !== id));
+    onShowToast('Kasus berhasil dihapus dari buku catatan.');
+  };
+
   const handleCopyAnalysis = () => {
     if (!analysis) return;
     const text = `
 LEMBAR KONSULTASI & STUDI KASUS KONSELOR BK SMP
 SATUAN PENDIDIKAN : ${profile.namaSekolah}
+INISIAL SISWA     : ${namaInisial}
 SASARAN           : ${kelas} (${bidang})
 FOKUS LAYANAN     : ${fokus}
+STATUS            : ${statusPenanganan}
 
 1. RINGKASAN KASUS:
 ${analysis.ringkasanKasus}
@@ -175,9 +238,10 @@ ${analysis.kodeEtikDanKerahasiaan}
               Ruang Diskusi & Formulasi Kasus Klinis-Pedagogis
             </h2>
             <p className="text-xs lg:text-sm text-slate-300 leading-relaxed">
-              Dapatkan rekomendasi pendekatan konseling (SFBC, CBT, REBT), panduan pertanyaan kunci wawancara konseli, serta strategi kolaborasi orang tua dan wali kelas sesuai Kode Etik ABKIN.
+              Dianalisis langsung menggunakan Gemini API SDK: pendekatan konseling (SFBC, CBT, REBT), pertanyaan kunci wawancara konseli, serta strategi kolaborasi tripusat sesuai Kode Etik ABKIN.
             </p>
           </div>
+
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => window.print()}
@@ -197,269 +261,488 @@ ${analysis.kodeEtikDanKerahasiaan}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Input Form (no-print) */}
-        <div className="no-print lg:col-span-5 space-y-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
-            <MessageSquareHeart className="w-4 h-4 text-indigo-600" />
-            <span>Parameter Studi Kasus Konseli</span>
-          </h3>
+      {/* Subtab Navigation: Konsultasi vs Buku Kasus */}
+      <div className="no-print flex p-1 bg-white border border-slate-200 rounded-xl max-w-md shadow-xs">
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('consultation')}
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+            activeSubTab === 'consultation'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <MessageSquareHeart className="w-4 h-4" />
+          <span>Analisis Kasus Aktif</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveSubTab('case_log')}
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
+            activeSubTab === 'case_log'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Bookmark className="w-4 h-4" />
+          <span>Buku Kasus Tersimpan ({caseEntries.length})</span>
+        </button>
+      </div>
 
-          {/* Preset Buttons */}
-          <div>
-            <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
-              <span>Pilihan Cepat Kasus Khas SMP:</span>
-            </div>
-            <div className="space-y-1.5">
-              {PRESET_KASUS_KONSELOR.map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleApplyPreset(item)}
-                  className="w-full text-left p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50/70 hover:border-indigo-300 transition-all text-xs text-slate-800"
+      {activeSubTab === 'consultation' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Input Form (no-print) */}
+          <div className="no-print lg:col-span-5 space-y-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider pb-2 border-b border-slate-100 flex items-center gap-1.5">
+              <MessageSquareHeart className="w-4 h-4 text-indigo-600" />
+              <span>Parameter Kasus Nyata Konseli</span>
+            </h3>
+
+            {/* Inisial & Status */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Inisial Nama Siswa:
+                </label>
+                <input
+                  type="text"
+                  value={namaInisial}
+                  onChange={(e) => setNamaInisial(e.target.value)}
+                  placeholder="Contoh: AM (Siswi)"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Status Penanganan:
+                </label>
+                <select
+                  value={statusPenanganan}
+                  onChange={(e) =>
+                    setStatusPenanganan(
+                      e.target.value as CounselingCaseEntry['statusPenanganan']
+                    )
+                  }
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800"
                 >
-                  <div className="font-bold text-slate-900 line-clamp-1">{item.judul}</div>
-                  <div className="text-[11px] text-slate-500 mt-0.5">
-                    {item.kelas} • Bidang {item.bidang}
-                  </div>
-                </button>
-              ))}
+                  <option value="Dalam Pemantauan">Dalam Pemantauan</option>
+                  <option value="Proses Konseling">Proses Konseling</option>
+                  <option value="Selesai">Selesai</option>
+                  <option value="Alih Tangan Kasus">Alih Tangan Kasus</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          {/* Form Fields */}
-          <div className="grid grid-cols-2 gap-3 pt-2">
+            {/* Preset Buttons */}
+            <div>
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-2">
+                <span>Inspirasi Preset Kasus SMP:</span>
+              </div>
+              <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                {PRESET_KASUS_KONSELOR.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleApplyPreset(item)}
+                    className="w-full text-left p-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-indigo-50/70 hover:border-indigo-300 transition-all text-xs text-slate-800 flex items-center justify-between"
+                  >
+                    <span className="font-semibold line-clamp-1">{item.judul}</span>
+                    <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded-full shrink-0 ml-2">
+                      {item.kelas}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Target Kelas & Bidang */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Kelas:
+                </label>
+                <select
+                  value={kelas}
+                  onChange={(e) => setKelas(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 outline-hidden"
+                >
+                  <option value="Kelas 7 SMP">Kelas 7 SMP (Fase D)</option>
+                  <option value="Kelas 8 SMP">Kelas 8 SMP (Fase D)</option>
+                  <option value="Kelas 9 SMP">Kelas 9 SMP (Fase D)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                  Bidang Masalah:
+                </label>
+                <select
+                  value={bidang}
+                  onChange={(e) => setBidang(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 outline-hidden"
+                >
+                  <option value="Pribadi">Pribadi</option>
+                  <option value="Sosial">Sosial</option>
+                  <option value="Belajar">Belajar</option>
+                  <option value="Karier">Karier</option>
+                  <option value="Sosial & Pribadi">Sosial & Pribadi</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Fokus Layanan */}
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                Sasaran Kelas
+                Bentuk / Fokus Intervensi:
               </label>
               <select
-                value={kelas}
-                onChange={(e) => setKelas(e.target.value)}
-                className="w-full p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-semibold"
+                value={fokus}
+                onChange={(e) => setFokus(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 outline-hidden"
               >
-                <option value="Kelas 7 SMP">Kelas 7 SMP</option>
-                <option value="Kelas 8 SMP">Kelas 8 SMP</option>
-                <option value="Kelas 9 SMP">Kelas 9 SMP</option>
+                <option value="Konseling Individual & Mediasi Sebaya">
+                  Konseling Individual & Mediasi Sebaya
+                </option>
+                <option value="Konseling Individual (CBT / SFBC)">
+                  Konseling Individual (CBT / SFBC)
+                </option>
+                <option value="Konferensi Kasus (Case Conference)">
+                  Konferensi Kasus (Case Conference)
+                </option>
+                <option value="Kunjungan Rumah (Home Visit)">
+                  Kunjungan Rumah (Home Visit)
+                </option>
+                <option value="Alih Tangan Kasus (Referral Psikolog)">
+                  Alih Tangan Kasus (Referral Psikolog)
+                </option>
               </select>
             </div>
+
+            {/* Input Deskripsi Kasus Nyata */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-slate-700 uppercase">
+                  Kronologi & Gejala Masalah Siswa:
+                </label>
+                <span className="text-[10px] text-slate-400">Deskripsi riil</span>
+              </div>
+              <textarea
+                rows={5}
+                value={kasus}
+                onChange={(e) => setKasus(e.target.value)}
+                placeholder="Tuliskan latar belakang masalah, perilaku yang teramati di kelas, durasi gejala, respon orang tua, dan situasi saat ini..."
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-xs text-slate-800 outline-hidden focus:border-indigo-500 focus:bg-white transition-all leading-relaxed"
+              />
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                Bidang Masalah
+                Catatan Rencana Tindak Lanjut Guru BK:
               </label>
-              <select
-                value={bidang}
-                onChange={(e) => setBidang(e.target.value)}
-                className="w-full p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-semibold"
+              <input
+                type="text"
+                value={catatanTindakLanjut}
+                onChange={(e) => setCatatanTindakLanjut(e.target.value)}
+                placeholder="Contoh: Sesi konseling 2 dijadwalkan hari Rabu..."
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800"
+              />
+            </div>
+
+            {/* Tombol Eksekusi AI & Simpan */}
+            <div className="space-y-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={handleConsult}
+                disabled={isLoading}
+                className="w-full py-3 bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700 hover:from-indigo-700 hover:to-blue-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2"
               >
-                <option value="Pribadi">Pribadi</option>
-                <option value="Sosial">Sosial</option>
-                <option value="Belajar">Belajar</option>
-                <option value="Karier">Karier</option>
-              </select>
+                <Sparkles className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                <span>
+                  {isLoading
+                    ? 'Sedang Menganalisis Kasus via Gemini API...'
+                    : 'Analisis Kasus dengan Gemini AI'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveToCaseLog}
+                className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2"
+              >
+                <Save className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Simpan Kasus Ini ke Buku Catatan Konselor</span>
+              </button>
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-              Fokus Penanganan
-            </label>
-            <input
-              type="text"
-              value={fokus}
-              onChange={(e) => setFokus(e.target.value)}
-              className="w-full p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-medium"
-              placeholder="Konseling Individual, Mediasi, dll."
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-              Deskripsi Kasus & Gejala Siswa
-            </label>
-            <textarea
-              rows={4}
-              value={kasus}
-              onChange={(e) => setKasus(e.target.value)}
-              placeholder="Ceritakan latar belakang masalah, perilaku yang terlihat di kelas, keluhan wali kelas atau orang tua..."
-              className="w-full p-3 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-hidden font-medium text-slate-800"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleConsult}
-            disabled={isLoading}
-            className="w-full py-3 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 shadow-md transition-all flex items-center justify-center space-x-2"
-          >
-            {isLoading ? (
-              <>
-                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Menganalisis Kasus dengan AI Pakar...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Analisis Kasus & Formulasi Solusi (AI)</span>
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Right Column: Case Analysis Document */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="print-area bg-white p-8 md:p-10 rounded-2xl border border-slate-200 shadow-lg text-slate-900 space-y-6">
-            {/* Header Laporan Kasus */}
-            <div className="border-b-2 border-slate-900 pb-3 text-center space-y-1">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                Unit Bimbingan dan Konseling • {profile.namaSekolah}
-              </h2>
-              <h3 className="text-base font-black text-slate-900 uppercase">
-                Lembar Studi Kasus & Rencana Tindakan Konseling (Fase D SMP)
+          {/* Right Column: AI Analysis Result Sheet */}
+          <div className="lg:col-span-7 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm print:shadow-none print:border-none print:p-0 space-y-6">
+            {/* Header Cetak */}
+            <div className="text-center border-b-2 border-slate-900 pb-4">
+              <h3 className="font-bold text-xs tracking-widest uppercase text-slate-800">
+                LEMBAR STUDI KASUS & REKOMENDASI KLINIS GURU BK
               </h3>
-              <p className="text-xs text-slate-600">
-                Dokumen Rahasia Berdasarkan Kode Etik Profesi Bimbingan dan Konseling Indonesia (ABKIN)
-              </p>
+              <h2 className="font-black text-base text-slate-900 uppercase">
+                {profile.namaSekolah}
+              </h2>
+              <div className="text-xs text-slate-600 mt-1">
+                KONSULTASI PEDAGOGIS KASUS PESERTA DIDIK SMP (FASE D)
+              </div>
             </div>
 
-            {analysis && (
-              <div className="space-y-5 text-xs">
-                {/* 1. Ringkasan Kasus */}
-                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                  <div className="font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-blue-600" />
-                    <span>1. Ringkasan Deskripsi Masalah Konseli</span>
-                  </div>
-                  <p className="text-slate-700 leading-relaxed pl-5">
-                    {analysis.ringkasanKasus}
+            {/* Identitas Kasus */}
+            <div className="bg-indigo-50/70 border border-indigo-200 rounded-xl p-3.5 grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <span className="text-slate-500">Inisial Konseli:</span>
+                <strong className="block text-indigo-900">{namaInisial}</strong>
+              </div>
+              <div>
+                <span className="text-slate-500">Sasaran & Bidang:</span>
+                <strong className="block text-indigo-900">
+                  {kelas} • {bidang}
+                </strong>
+              </div>
+              <div>
+                <span className="text-slate-500">Bentuk Layanan:</span>
+                <strong className="block text-slate-900">{fokus}</strong>
+              </div>
+              <div>
+                <span className="text-slate-500">Status Penanganan:</span>
+                <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-900 mt-0.5">
+                  {statusPenanganan}
+                </span>
+              </div>
+            </div>
+
+            {analysis ? (
+              <div className="space-y-5 text-xs text-slate-800">
+                {/* Ringkasan */}
+                <div className="space-y-1 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                  <span className="font-bold text-slate-900 uppercase tracking-wider block text-[11px]">
+                    1. Ringkasan Sintesis Kasus:
+                  </span>
+                  <p className="leading-relaxed text-slate-700">{analysis.ringkasanKasus}</p>
+                </div>
+
+                {/* Dinamika Psikologis Remaja */}
+                <div className="space-y-1">
+                  <span className="font-bold text-slate-900 uppercase tracking-wider block text-[11px]">
+                    2. Karakteristik Perkembangan Remaja Fase D (Usia 12-15 Tahun):
+                  </span>
+                  <p className="leading-relaxed text-slate-700 pl-3 border-l-2 border-indigo-400">
+                    {analysis.karakteristikRemaja}
                   </p>
                 </div>
 
-                {/* 2. Karakteristik & Hipotesis Dinamika */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="p-3.5 bg-blue-50/60 border border-blue-200 rounded-xl space-y-1">
-                    <div className="font-bold text-blue-900 flex items-center gap-1.5">
-                      <Compass className="w-4 h-4 text-blue-600" />
-                      <span>Karakteristik Psikologis Remaja (Fase D)</span>
-                    </div>
-                    <p className="text-slate-700 leading-relaxed text-[11px]">
-                      {analysis.karakteristikRemaja}
-                    </p>
-                  </div>
-                  <div className="p-3.5 bg-indigo-50/60 border border-indigo-200 rounded-xl space-y-1">
-                    <div className="font-bold text-indigo-900 flex items-center gap-1.5">
-                      <Lightbulb className="w-4 h-4 text-indigo-600" />
-                      <span>Hipotesis Dinamika Psikologis</span>
-                    </div>
-                    <p className="text-slate-700 leading-relaxed text-[11px]">
-                      {analysis.hipotesisDinamika}
-                    </p>
-                  </div>
+                {/* Hipotesis Masalah */}
+                <div className="space-y-1">
+                  <span className="font-bold text-slate-900 uppercase tracking-wider block text-[11px]">
+                    3. Hipotesis Dinamika Psikologis & Faktor Pemicu:
+                  </span>
+                  <p className="leading-relaxed text-slate-700 pl-3 border-l-2 border-indigo-400">
+                    {analysis.hipotesisDinamika}
+                  </p>
                 </div>
 
-                {/* 3. Rekomendasi Pendekatan */}
-                <div className="p-3.5 bg-amber-50/60 border border-amber-200 rounded-xl space-y-1">
-                  <div className="font-bold text-amber-900 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-amber-600" />
-                    <span>Rekomendasi Pendekatan Konseling:</span>
-                  </div>
-                  <p className="text-slate-800 font-medium pl-5 leading-relaxed">
+                {/* Pendekatan Konseling */}
+                <div className="space-y-1 bg-blue-50/60 p-3.5 rounded-xl border border-blue-200">
+                  <span className="font-bold text-blue-900 uppercase tracking-wider block text-[11px]">
+                    4. Pendekatan Konseling yang Direkomendasikan:
+                  </span>
+                  <p className="leading-relaxed text-blue-950 font-medium">
                     {analysis.rekomendasiPendekatan}
                   </p>
                 </div>
 
-                {/* 4. Tahapan Konseling Individual */}
+                {/* Tahapan Konseling */}
                 <div className="space-y-2">
-                  <div className="font-black text-slate-900 uppercase tracking-wider">
-                    Panduan Alur Wawancara Konseling Individual:
-                  </div>
+                  <span className="font-bold text-slate-900 uppercase tracking-wider block text-[11px]">
+                    5. Langkah Operasional Konseling Individual:
+                  </span>
                   <div className="space-y-2">
-                    {analysis.tahapanKonseling?.map((step, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 bg-white border border-slate-200 rounded-xl space-y-1"
-                      >
-                        <div className="font-bold text-blue-900 text-xs">
-                          {step.tahap}
-                        </div>
-                        <p className="text-slate-700 leading-relaxed text-[11px] pl-2">
-                          {step.deskripsi}
-                        </p>
+                    {analysis.tahapanKonseling?.map((t, idx) => (
+                      <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                        <div className="font-bold text-slate-900 mb-0.5">{t.tahap}</div>
+                        <p className="text-slate-600 leading-relaxed text-[11px]">{t.deskripsi}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* 5. Pertanyaan Kunci Konselor */}
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <HelpCircle className="w-4 h-4 text-indigo-600" />
-                    <span>Contoh Pertanyaan Kunci Penggugah Insight (Miracle & Scaling):</span>
-                  </div>
-                  <ul className="space-y-1.5 pl-5 text-slate-700">
-                    {analysis.pertanyaanKunciKonselor?.map((q, i) => (
-                      <li key={i} className="list-disc italic text-[11px] leading-relaxed">
+                {/* Pertanyaan Kunci Konselor */}
+                <div className="space-y-2 bg-amber-50/60 p-3.5 rounded-xl border border-amber-200">
+                  <span className="font-bold text-amber-900 uppercase tracking-wider block text-[11px]">
+                    6. Pertanyaan Pemandu Konselor (Miracle & Scaling Questions):
+                  </span>
+                  <ul className="space-y-1.5 pl-4 text-amber-950">
+                    {analysis.pertanyaanKunciKonselor?.map((q, idx) => (
+                      <li key={idx} className="list-disc leading-relaxed italic text-[11px]">
                         {q}
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* 6. Kolaborasi Tripusat */}
+                {/* Kolaborasi Tripusat */}
                 <div className="space-y-2">
-                  <div className="font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-emerald-600" />
-                    <span>Kolaborasi Tripusat Pendidikan</span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px]">
+                  <span className="font-bold text-slate-900 uppercase tracking-wider block text-[11px]">
+                    7. Rencana Kolaborasi Tripusat Pendidikan:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
-                      <div className="font-bold text-slate-800 mb-1">Wali Kelas:</div>
-                      <p className="text-slate-600 leading-relaxed">
-                        {analysis.kolaborasiTripusat?.waliKelas}
+                      <div className="font-bold text-slate-800 text-[11px] mb-1">Wali Kelas:</div>
+                      <p className="text-[10px] text-slate-600 leading-snug">
+                        {analysis.kolaborasiTripusat.waliKelas}
                       </p>
                     </div>
                     <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
-                      <div className="font-bold text-slate-800 mb-1">Orang Tua / Rumah:</div>
-                      <p className="text-slate-600 leading-relaxed">
-                        {analysis.kolaborasiTripusat?.orangTua}
+                      <div className="font-bold text-slate-800 text-[11px] mb-1">Orang Tua / Wali:</div>
+                      <p className="text-[10px] text-slate-600 leading-snug">
+                        {analysis.kolaborasiTripusat.orangTua}
                       </p>
                     </div>
                     <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg">
-                      <div className="font-bold text-slate-800 mb-1">Teman Sebaya (Peer):</div>
-                      <p className="text-slate-600 leading-relaxed">
-                        {analysis.kolaborasiTripusat?.temanSebaya}
+                      <div className="font-bold text-slate-800 text-[11px] mb-1">Teman Sebaya:</div>
+                      <p className="text-[10px] text-slate-600 leading-snug">
+                        {analysis.kolaborasiTripusat.temanSebaya}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* 7. Asas Kerahasiaan ABKIN */}
-                <div className="p-3 bg-rose-50/70 border border-rose-200 rounded-xl flex items-start space-x-2 text-[11px] text-rose-900">
-                  <ShieldCheck className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold">Kode Etik Kerahasiaan Konseling: </span>
-                    <span>{analysis.kodeEtikDanKerahasiaan}</span>
+                {/* Asas Kerahasiaan ABKIN */}
+                <div className="p-3 bg-slate-900 text-slate-200 rounded-xl space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>8. Kepatuhan Kode Etik ABKIN & Asas Kerahasiaan:</span>
                   </div>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    {analysis.kodeEtikDanKerahasiaan}
+                  </p>
                 </div>
 
-                {/* Lembar Paraf Konselor */}
-                <div className="pt-4 border-t border-slate-300 flex justify-between items-end text-xs">
-                  <div>
-                    <span className="text-slate-500 block">Status Kasus: Dalam Pemantauan Terjadwal</span>
-                    <span className="text-slate-500">Tercatat pada Buku Kasus BK: Semester {profile.semester}</span>
-                  </div>
-                  <div className="text-right">
-                    <p>{profile.kota}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                    <p className="font-bold mt-1">Konselor / Guru BK Pelaksana,</p>
-                    <p className="font-bold underline uppercase mt-12">{profile.namaGuruBK}</p>
-                    <p className="text-slate-600">NIP. {profile.nipGuruBK || '-'}</p>
+                {/* Tanda Tangan Konselor */}
+                <div className="pt-6 border-t border-slate-300 flex justify-end">
+                  <div className="text-right space-y-12">
+                    <div>
+                      <p>{profile.kota}, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                      <p className="font-bold">Konselor / Guru BK Pelaksana,</p>
+                    </div>
+                    <div>
+                      <p className="font-bold underline uppercase">{profile.namaGuruBK}</p>
+                      <p className="text-slate-600">NIP. {profile.nipGuruBK || '_________________________'}</p>
+                    </div>
                   </div>
                 </div>
+              </div>
+            ) : (
+              <div className="text-center py-16 text-slate-400 text-xs">
+                Klik tombol "Analisis Kasus dengan Gemini AI" untuk melihat formulasi kasus klinis.
               </div>
             )}
           </div>
         </div>
-      </div>
+      ) : (
+        /* BUKU CATATAN KASUS KONSELOR (ARSHIP) */
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Bookmark className="w-5 h-5 text-indigo-600" />
+                <span>Buku Catatan Kasus Konselor (Tersimpan di Browser)</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Riwayat kasus individual peserta didik dengan status pemantauan dan rekomendasi intervensi
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('consultation')}
+              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition-colors"
+            >
+              + Buat Analisis Kasus Baru
+            </button>
+          </div>
+
+          {caseEntries.length === 0 ? (
+            <div className="text-center py-12 text-slate-400 text-xs">
+              Belum ada kasus yang dicatat ke buku kasus. Analisis kasus di tab sebelah dan klik tombol "Simpan Kasus Ini".
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden">
+              {caseEntries.map((entry) => (
+                <div
+                  key={entry.id}
+                  className="p-4 hover:bg-slate-50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-slate-900 text-sm">
+                        {entry.namaSiswaInisial}
+                      </span>
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          entry.statusPenanganan === 'Selesai'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : entry.statusPenanganan === 'Alih Tangan Kasus'
+                            ? 'bg-rose-100 text-rose-800'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}
+                      >
+                        {entry.statusPenanganan}
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium">
+                        • {entry.kelas} • {entry.bidang} • {entry.tanggal}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-600 line-clamp-1">
+                      <strong>Kronologi:</strong> {entry.deskripsiKasus}
+                    </div>
+                    <div className="text-xs text-indigo-700 line-clamp-1">
+                      <strong>Pendekatan:</strong> {entry.analysis.rekomendasiPendekatan}
+                    </div>
+                    {entry.catatanTindakLanjut && (
+                      <div className="text-[11px] text-slate-500 italic">
+                        Tindak Lanjut: {entry.catatanTindakLanjut}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleLoadSavedCase(entry)}
+                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors"
+                    >
+                      Buka & Tinjau
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleLoadSavedCase(entry);
+                        setTimeout(() => window.print(), 100);
+                      }}
+                      className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>Cetak</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSavedCase(entry.id)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors rounded-lg"
+                      title="Hapus dari buku kasus"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

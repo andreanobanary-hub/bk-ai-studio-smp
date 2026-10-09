@@ -9,6 +9,7 @@ import { RPLView } from './components/RPLView';
 import { AsesmenView } from './components/AsesmenView';
 import { LKPDView } from './components/LKPDView';
 import { KonsultasiView } from './components/KonsultasiView';
+import { loadRPLData, saveRPLData } from './services/storageService';
 import { getActiveApiKey } from './services/geminiClient';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -31,8 +32,16 @@ export default function App() {
     }
   });
 
-  // Current RPL data in memory
-  const [rplData, setRplData] = useState<RPLData>(DEFAULT_RPL);
+  // Current RPL data in memory with persistence
+  const [rplData, setRplDataState] = useState<RPLData>(() => loadRPLData());
+
+  const setRplData = (val: RPLData | ((prev: RPLData) => RPLData)) => {
+    setRplDataState((prev) => {
+      const updated = typeof val === 'function' ? val(prev) : val;
+      saveRPLData(updated);
+      return updated;
+    });
+  };
 
   const handleSaveProfile = (newProfile: SchoolProfile) => {
     setProfile(newProfile);

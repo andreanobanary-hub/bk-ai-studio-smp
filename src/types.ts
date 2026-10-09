@@ -69,8 +69,69 @@ export interface StudentPeer {
   id: number;
   nama: string;
   gender: 'L' | 'P';
+  nisn?: string;
   pilihan1Id: number;
   pilihan2Id: number;
+  ikmsResponses?: number[]; // IDs of IKMS items checked by the student
+  timestamp?: string;
+  submittedViaPortal?: boolean;
+}
+
+export interface ClassRoom {
+  id: string;
+  namaKelas: string;
+  tingkat: 'Kelas 7 SMP' | 'Kelas 8 SMP' | 'Kelas 9 SMP' | string;
+  tahunPelajaran: string;
+  kriteriaSosiometri: string;
+  siswa: StudentPeer[];
+  googleSheetSyncUrl?: string;
+  lastSyncTime?: string;
+}
+
+export interface IKMSItem {
+  id: number;
+  bidang: 'Pribadi' | 'Sosial' | 'Belajar' | 'Karier';
+  pernyataan: string;
+}
+
+export interface IKMSSummary {
+  bidang: 'Pribadi' | 'Sosial' | 'Belajar' | 'Karier';
+  persentase: number;
+  jumlahPemilih: number;
+  totalRespons: number;
+  warna: string;
+  deskripsi: string;
+  topIssues: Array<{ id: number; pernyataan: string; persentase: number; count: number }>;
+}
+
+export interface LKPDSubmission {
+  id: string;
+  tipe: 'Individu' | 'Kelompok';
+  namaSiswaAtauKelompok: string;
+  anggotaKelompok?: string[];
+  kelas: string;
+  tanggal: string;
+  topik: string;
+  fact: string;
+  feeling: string;
+  finding: string;
+  future: string;
+  komitmen: string[];
+  catatanKonselor?: string;
+  parafKonselor?: boolean;
+}
+
+export interface CounselingCaseEntry {
+  id: string;
+  tanggal: string;
+  namaSiswaInisial: string;
+  kelas: string;
+  bidang: string;
+  fokus: string;
+  deskripsiKasus: string;
+  analysis: CaseAnalysis;
+  statusPenanganan: 'Dalam Pemantauan' | 'Proses Konseling' | 'Selesai' | 'Alih Tangan Kasus';
+  catatanTindakLanjut?: string;
 }
 
 export interface SosiometriResult {

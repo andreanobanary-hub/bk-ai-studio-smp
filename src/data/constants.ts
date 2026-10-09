@@ -1,4 +1,4 @@
-import { SchoolProfile, RPLData, StudentPeer } from '../types';
+import { SchoolProfile, RPLData, StudentPeer, IKMSItem, ClassRoom } from '../types';
 
 export const DEFAULT_SCHOOL_PROFILE: SchoolProfile = {
   namaSekolah: 'SMP Negeri 1 Madani Nusantara',
@@ -179,22 +179,94 @@ export const DEFAULT_RPL: RPLData = {
   tindakLanjut: 'Guru BK melakukan pemantauan sosiometri kelas berkala. Siswa yang terindikasi sering menyendiri atau menunjukkan tanda trauma akan diberikan layanan Konseling Individual atau Bimbingan Kelompok.'
 };
 
+export const STANDARD_IKMS_ITEMS: IKMSItem[] = [
+  // Pribadi (id 101 - 104)
+  { id: 101, bidang: 'Pribadi', pernyataan: 'Merasa sulit membatasi waktu main game / media sosial hingga larut malam' },
+  { id: 102, bidang: 'Pribadi', pernyataan: 'Sering merasa cemas dan kurang percaya diri saat berbicara di depan kelas' },
+  { id: 103, bidang: 'Pribadi', pernyataan: 'Mudah terpancing emosi dan tersinggung ketika diejek atau dikritik teman' },
+  { id: 104, bidang: 'Pribadi', pernyataan: 'Sering merasa sedih/kesepian dan sulit menceritakan perasaan kepada orang lain' },
+  // Sosial (id 201 - 204)
+  { id: 201, bidang: 'Sosial', pernyataan: 'Merasa takut tidak punya teman dekat di kelas atau dikucilkan dari kelompok' },
+  { id: 202, bidang: 'Sosial', pernyataan: 'Pernah menyaksikan atau menjadi sasaran ejekan/perundungan verbal di media sosial' },
+  { id: 203, bidang: 'Sosial', pernyataan: 'Merasa canggung dan sulit beradaptasi dengan teman baru di sekolah' },
+  { id: 204, bidang: 'Sosial', pernyataan: 'Sulit menolak ajakan teman sebaya yang bertentangan dengan kata hati atau aturan' },
+  // Belajar (id 301 - 304)
+  { id: 301, bidang: 'Belajar', pernyataan: 'Kesulitan mengatur jadwal belajar mandiri di rumah dan sering menunda mengerjakan tugas' },
+  { id: 302, bidang: 'Belajar', pernyataan: 'Sulit berkonsentrasi saat guru menerangkan materi di dalam kelas' },
+  { id: 303, bidang: 'Belajar', pernyataan: 'Belum memahami strategi dan cara belajar yang paling efektif sesuai gaya belajar saya' },
+  { id: 304, bidang: 'Belajar', pernyataan: 'Merasa sangat tertekan atau panik menjelang ujian / penilaian sumatif' },
+  // Karier (id 401 - 404)
+  { id: 402, bidang: 'Karier', pernyataan: 'Belum mengetahui bakat, minat, dan potensi menonjol yang ada pada diri sendiri' },
+  { id: 401, bidang: 'Karier', pernyataan: 'Masih bingung memahami perbedaan mendasar serta prospek lanjut ke SMA atau SMK' },
+  { id: 403, bidang: 'Karier', pernyataan: 'Pilihan cita-cita atau jurusan lanjutan berbeda dengan harapan orang tua' },
+  { id: 404, bidang: 'Karier', pernyataan: 'Membutuhkan informasi mengenai ragam profesi masa depan di era digital' },
+];
+
 export const SAMPLE_STUDENTS_7A: StudentPeer[] = [
-  { id: 1, nama: 'Aditya Pratama', gender: 'L', pilihan1Id: 2, pilihan2Id: 4 },
-  { id: 2, nama: 'Bagas Wicaksono', gender: 'L', pilihan1Id: 1, pilihan2Id: 4 },
-  { id: 3, nama: 'Chandra Kirana', gender: 'L', pilihan1Id: 1, pilihan2Id: 2 },
-  { id: 4, nama: 'Dinda Ayu Maharani', gender: 'P', pilihan1Id: 5, pilihan2Id: 6 },
-  { id: 5, nama: 'Eka Nurul Hidayah', gender: 'P', pilihan1Id: 4, pilihan2Id: 6 },
-  { id: 6, nama: 'Farhan Maulana', gender: 'L', pilihan1Id: 1, pilihan2Id: 2 },
-  { id: 7, nama: 'Gita Saraswati', gender: 'P', pilihan1Id: 4, pilihan2Id: 5 },
-  { id: 8, nama: 'Hendra Saputra (Sering Menyendiri)', gender: 'L', pilihan1Id: 1, pilihan2Id: 2 }, // 0 incoming choices!
-  { id: 9, nama: 'Intan Permata', gender: 'P', pilihan1Id: 4, pilihan2Id: 7 },
-  { id: 10, nama: 'Joko Susilo', gender: 'L', pilihan1Id: 2, pilihan2Id: 6 },
-  { id: 11, nama: 'Karin Amanda', gender: 'P', pilihan1Id: 4, pilihan2Id: 5 },
-  { id: 12, nama: 'Lukman Hakim', gender: 'L', pilihan1Id: 1, pilihan2Id: 6 },
-  { id: 13, nama: 'Mega Lestari (Murid Baru Pindahan)', gender: 'P', pilihan1Id: 4, pilihan2Id: 9 }, // 0 incoming choices!
-  { id: 14, nama: 'Naufal Rizky', gender: 'L', pilihan1Id: 2, pilihan2Id: 1 },
-  { id: 15, nama: 'Olivia Ramadhani', gender: 'P', pilihan1Id: 5, pilihan2Id: 4 },
+  { id: 1, nama: 'Aditya Pratama', gender: 'L', nisn: '0091238471', pilihan1Id: 2, pilihan2Id: 4, ikmsResponses: [101, 204, 301, 401], timestamp: '2026-10-08 08:15', submittedViaPortal: true },
+  { id: 2, nama: 'Bagas Wicaksono', gender: 'L', nisn: '0091238472', pilihan1Id: 1, pilihan2Id: 4, ikmsResponses: [101, 103, 301, 302], timestamp: '2026-10-08 08:18', submittedViaPortal: true },
+  { id: 3, nama: 'Chandra Kirana', gender: 'L', nisn: '0091238473', pilihan1Id: 1, pilihan2Id: 2, ikmsResponses: [102, 201, 301, 402], timestamp: '2026-10-08 08:20', submittedViaPortal: true },
+  { id: 4, nama: 'Dinda Ayu Maharani', gender: 'P', nisn: '0091238474', pilihan1Id: 5, pilihan2Id: 6, ikmsResponses: [102, 201, 202, 304], timestamp: '2026-10-08 08:22', submittedViaPortal: true },
+  { id: 5, nama: 'Eka Nurul Hidayah', gender: 'P', nisn: '0091238475', pilihan1Id: 4, pilihan2Id: 6, ikmsResponses: [201, 303, 401, 402], timestamp: '2026-10-08 08:25', submittedViaPortal: true },
+  { id: 6, nama: 'Farhan Maulana', gender: 'L', nisn: '0091238476', pilihan1Id: 1, pilihan2Id: 2, ikmsResponses: [101, 202, 301, 404], timestamp: '2026-10-08 08:27', submittedViaPortal: true },
+  { id: 7, nama: 'Gita Saraswati', gender: 'P', nisn: '0091238477', pilihan1Id: 4, pilihan2Id: 5, ikmsResponses: [102, 104, 201, 302], timestamp: '2026-10-08 08:30', submittedViaPortal: true },
+  { id: 8, nama: 'Hendra Saputra (Sering Menyendiri)', gender: 'L', nisn: '0091238478', pilihan1Id: 1, pilihan2Id: 2, ikmsResponses: [102, 104, 201, 202, 203], timestamp: '2026-10-08 08:32', submittedViaPortal: true },
+  { id: 9, nama: 'Intan Permata', gender: 'P', nisn: '0091238479', pilihan1Id: 4, pilihan2Id: 7, ikmsResponses: [201, 304, 401, 403], timestamp: '2026-10-08 08:35', submittedViaPortal: true },
+  { id: 10, nama: 'Joko Susilo', gender: 'L', nisn: '0091238480', pilihan1Id: 2, pilihan2Id: 6, ikmsResponses: [101, 103, 301, 402], timestamp: '2026-10-08 08:38', submittedViaPortal: true },
+  { id: 11, nama: 'Karin Amanda', gender: 'P', nisn: '0091238481', pilihan1Id: 4, pilihan2Id: 5, ikmsResponses: [102, 201, 202, 402], timestamp: '2026-10-08 08:40', submittedViaPortal: true },
+  { id: 12, nama: 'Lukman Hakim', gender: 'L', nisn: '0091238482', pilihan1Id: 1, pilihan2Id: 6, ikmsResponses: [101, 301, 303, 401], timestamp: '2026-10-08 08:42', submittedViaPortal: true },
+  { id: 13, nama: 'Mega Lestari (Murid Baru Pindahan)', gender: 'P', nisn: '0091238483', pilihan1Id: 4, pilihan2Id: 9, ikmsResponses: [104, 201, 203, 301], timestamp: '2026-10-08 08:45', submittedViaPortal: true },
+  { id: 14, nama: 'Naufal Rizky', gender: 'L', nisn: '0091238484', pilihan1Id: 2, pilihan2Id: 1, ikmsResponses: [101, 204, 302, 404], timestamp: '2026-10-08 08:48', submittedViaPortal: true },
+  { id: 15, nama: 'Olivia Ramadhani', gender: 'P', nisn: '0091238485', pilihan1Id: 5, pilihan2Id: 4, ikmsResponses: [102, 201, 304, 401], timestamp: '2026-10-08 08:50', submittedViaPortal: true },
+];
+
+export const INITIAL_CLASSES: ClassRoom[] = [
+  {
+    id: 'kelas-7a',
+    namaKelas: 'Kelas 7-A',
+    tingkat: 'Kelas 7 SMP',
+    tahunPelajaran: '2026/2027',
+    kriteriaSosiometri: 'Teman Belajar Kelompok & Berbagi Cerita',
+    siswa: SAMPLE_STUDENTS_7A,
+    googleSheetSyncUrl: '',
+    lastSyncTime: '2026-10-08 08:50',
+  },
+  {
+    id: 'kelas-8b',
+    namaKelas: 'Kelas 8-B',
+    tingkat: 'Kelas 8 SMP',
+    tahunPelajaran: '2026/2027',
+    kriteriaSosiometri: 'Rekan Diskusi & Sahabat Kolaborasi Proyek',
+    siswa: [
+      { id: 1, nama: 'Andi Firmansyah', gender: 'L', pilihan1Id: 2, pilihan2Id: 3, ikmsResponses: [101, 301, 401] },
+      { id: 2, nama: 'Bella Safitri', gender: 'P', pilihan1Id: 1, pilihan2Id: 4, ikmsResponses: [102, 201, 402] },
+      { id: 3, nama: 'Cahyo Utomo', gender: 'L', pilihan1Id: 1, pilihan2Id: 2, ikmsResponses: [103, 302, 403] },
+      { id: 4, nama: 'Dewi Lestari', gender: 'P', pilihan1Id: 2, pilihan2Id: 5, ikmsResponses: [201, 202, 304] },
+      { id: 5, nama: 'Erlangga Putra', gender: 'L', pilihan1Id: 1, pilihan2Id: 2, ikmsResponses: [101, 204, 301] },
+      { id: 6, nama: 'Fani Rahmawati (Terisolasi)', gender: 'P', pilihan1Id: 2, pilihan2Id: 4, ikmsResponses: [104, 201, 203] },
+      { id: 7, nama: 'Gilang Ramadhan', gender: 'L', pilihan1Id: 1, pilihan2Id: 3, ikmsResponses: [301, 303, 401] },
+      { id: 8, nama: 'Hany Handayani', gender: 'P', pilihan1Id: 2, pilihan2Id: 4, ikmsResponses: [102, 201, 402] },
+    ],
+    googleSheetSyncUrl: '',
+    lastSyncTime: '2026-10-08 09:00',
+  },
+  {
+    id: 'kelas-9c',
+    namaKelas: 'Kelas 9-C',
+    tingkat: 'Kelas 9 SMP',
+    tahunPelajaran: '2026/2027',
+    kriteriaSosiometri: 'Teman Diskusi Persiapan Pemilihan Lanjutan SMA/SMK',
+    siswa: [
+      { id: 1, nama: 'Alvin Pratama', gender: 'L', pilihan1Id: 2, pilihan2Id: 3, ikmsResponses: [401, 402, 403] },
+      { id: 2, nama: 'Bunga Citra', gender: 'P', pilihan1Id: 1, pilihan2Id: 4, ikmsResponses: [304, 401, 402] },
+      { id: 3, nama: 'Coki Pardede', gender: 'L', pilihan1Id: 1, pilihan2Id: 2, ikmsResponses: [101, 401, 404] },
+      { id: 4, nama: 'Dara Puspita', gender: 'P', pilihan1Id: 2, pilihan2Id: 5, ikmsResponses: [201, 401, 403] },
+      { id: 5, nama: 'Evan Dimas', gender: 'L', pilihan1Id: 1, pilihan2Id: 2, ikmsResponses: [301, 402, 404] },
+      { id: 6, nama: 'Fitriani (Pendiam)', gender: 'P', pilihan1Id: 2, pilihan2Id: 4, ikmsResponses: [102, 104, 401] },
+    ],
+    googleSheetSyncUrl: '',
+    lastSyncTime: '2026-10-08 09:15',
+  },
 ];
 
 export const IKMS_NEED_DATA = [
