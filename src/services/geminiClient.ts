@@ -29,6 +29,9 @@ function getGeminiClient(): GoogleGenAI {
   return new GoogleGenAI({ apiKey });
 }
 
+// Active Gemini model requested
+export const GEMINI_MODEL = 'gemini-3.6-flash';
+
 // Client-side RPL Generation
 export async function generateRPLClient(params: {
   kelas: string;
@@ -111,7 +114,7 @@ Format output JSON harus memiliki struktur:
 }`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3.8-flash',
+    model: GEMINI_MODEL,
     contents: userPrompt,
     config: {
       systemInstruction: systemPrompt,
@@ -170,7 +173,7 @@ Berikan analisa dan rekomendasi profesional dalam format JSON:
 }`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3.8-flash',
+    model: GEMINI_MODEL,
     contents: userPrompt,
     config: {
       systemInstruction: systemPrompt,
@@ -231,7 +234,7 @@ Format JSON:
 }`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3.8-flash',
+    model: GEMINI_MODEL,
     contents: userPrompt,
     config: {
       systemInstruction: systemPrompt,

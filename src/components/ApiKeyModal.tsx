@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getActiveApiKey, setActiveApiKey } from '../services/geminiClient';
+import { getActiveApiKey, setActiveApiKey, GEMINI_MODEL } from '../services/geminiClient';
 import { Key, Eye, EyeOff, Check, X, ShieldAlert, Sparkles, RefreshCw } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 
@@ -53,14 +53,14 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
     try {
       const ai = new GoogleGenAI({ apiKey: keyToTest });
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: GEMINI_MODEL,
         contents: 'Katakan "OK" jika terhubung.',
       });
 
       if (response && response.text) {
         setTestResult({
           success: true,
-          message: 'Koneksi Berhasil! Model gemini-3.8-flash aktif dan siap digunakan.',
+          message: `Koneksi Berhasil! Model ${GEMINI_MODEL} aktif dan siap digunakan.`,
         });
       } else {
         throw new Error('Tidak ada respon dari model');
