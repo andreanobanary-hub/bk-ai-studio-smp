@@ -93,15 +93,20 @@ export const DEFAULT_RPL: RPLData = {
   bidang: 'Sosial',
   fungsi: 'Pencegahan',
   alokasiWaktu: '2 x 40 menit',
-  pendekatan: 'Alur ARKA (Aktivitas, Refleksi, Konseptualisasi, Aplikasi)',
-  skkpd: 'Kematangan Hubungan dengan Teman Sebaya (Mampu membina relasi yang sehat, menghargai perbedaan, dan mencegah perilaku perundungan)',
+  pendekatan: 'Pendekatan Deep Learning (Mindful, Meaningful, Joyful Learning) berbasis Alur ARKA',
+  pendekatanDeepLearning: {
+    mindfulLearning: 'Mengembangkan kesadaran penuh (Mindfulness) peserta didik dalam mengenali emosi, prasangka diri, dan kepekaan sosial saat berinteraksi dengan teman sebaya di sekolah.',
+    meaningfulLearning: 'Menghubungkan esensi materi pertemanan sehat secara autentik dengan realitas pergaulan sehari-hari di SMP, menumbuhkan pemaknaan batin dan nilai empati kemanusiaan.',
+    joyfulLearning: 'Menciptakan ruang bimbingan yang aman secara psikologis, bebas perundungan, interaktif, dan menggembirakan melalui dinamika kelompok yang positif.'
+  },
+  skkpd: 'Kematangan Hubungan dengan Teman Sebaya (Mampu membina relasi yang sehat, menghargai keberagaman, dan menunjukkan aksi nyata pencegahan perundungan)',
   profilPelajarPancasila: ['Bergotong Royong', 'Bernalar Kritis', 'Mandiri'],
-  capaianLayanan: 'Peserta didik mampu memahami hakikat relasi pertemanan yang positif, mengidentifikasi tanda-tanda interaksi yang merugikan (bullying fisik, verbal, maupun cyberbullying), serta menunjukkan perilaku saling menghargai dan kepedulian sosial di lingkungan kelas.',
-  tujuanUmum: 'Peserta didik kelas 7 SMP mampu membangun relasi pertemanan yang suportif, saling menghargai perbedaan, dan memiliki keberanian moral menolak tindakan bullying.',
+  capaianLayanan: 'Peserta didik mampu memahami hakikat relasi pertemanan yang positif, mengidentifikasi faktor risiko interaksi yang merugikan (bullying fisik, verbal, relasional, maupun cyberbullying), serta menunjukkan perilaku saling menghargai, komunikasi asertif, dan kepedulian sosial di lingkungan kelas.',
+  tujuanUmum: 'Peserta didik kelas 7 SMP mampu membangun relasi pertemanan yang suportif, saling menghargai perbedaan, dan memiliki keberanian moral menolak tindakan bullying melalui pembiasaan kesadaran diri dan empati mendalam.',
   tujuanKhusus: [
-    '1. Peserta didik dapat menganalisis bentuk-bentuk bullying dan dampaknya bagi teman sebaya (Kognitif/C4)',
-    '2. Peserta didik dapat mengekspresikan empati dan komitmen menciptakan kelas yang aman dan ramah teman (Afektif/A3)',
-    '3. Peserta didik dapat mendemonstrasikan tindakan "Upstander" (membantu teman yang tersudut) melalui simulasi role play (Psikomotorik/P3)'
+    '1. Peserta didik dapat menganalisis bentuk-bentuk bullying dan dampaknya bagi teman sebaya secara kritis (Kognitif/C4)',
+    '2. Peserta didik dapat mengekspresikan empati dan komitmen menciptakan iklim kelas yang aman dan ramah teman (Afektif/A3)',
+    '3. Peserta didik dapat mendemonstrasikan aksi nyata sebagai "Upstander" (sahabat pelindung) melalui simulasi role play (Psikomotorik/P3)'
   ],
   materiPokok: [
     'Pengertian pertemanan sehat (Healthy Friendship) vs pertemanan beracun (Toxic Peer)',
@@ -110,34 +115,47 @@ export const DEFAULT_RPL: RPLData = {
     'Strategi komunikasi asertif "I-Message" untuk menolak perlakuan tidak menyenangkan'
   ],
   mediaDanAlat: 'Video Studi Kasus "Satu Suara Melawan Bullying", Kartu Skenario ARKA, Lembar LKPD Refleksi 4F, Poster Komitmen Kelas, Spidol & Sticky Notes',
-  metode: 'Experiential Learning berbasis Alur ARKA, Diskusi Kelompok Kolaboratif, Pemutaran Video, dan Role-Playing',
+  metode: 'Deep Learning (Mindful, Meaningful, Joyful Learning), Alur ARKA, Diskusi Kolaboratif, Pemutaran Video, dan Role-Playing',
   langkahKegiatan: {
     tahapAwal: {
       waktu: '10 Menit',
       kegiatan: [
-        'Guru BK membuka layanan dengan salam ceria, memimpin doa bersama, dan memeriksa kesiapan belajar serta kehadiran siswa.',
-        'Apersepsi dan Ice Breaking energik "Lingkaran Kebaikan Sebaya" untuk membangun keterbukaan dan kehangatan emosional.',
-        'Guru BK menyampaikan topik layanan dan tujuan yang ingin dicapai bersama.',
-        'Guru BK menjelaskan alur kegiatan ARKA dan menyepakati aturan main: saling menghargai pendapat dan menjaga kenyamanan bersama.'
+        'Guru BK menyapa peserta didik dengan hangat, memimpin doa bersama, dan memeriksa kesiapan belajar serta kehadiran siswa.',
+        'Apersepsi Mindful Learning: Mengajak siswa hening sejenak (Teknik STOP / Tarik Nafas Sadar) dan Ice Breaking energik "Lingkaran Kebaikan Sebaya" untuk membangun keterbukaan emosional yang menyenangkan (Joyful).',
+        'Guru BK menyampaikan topik layanan dan mengaitkannya dengan pentingnya rasa aman di sekolah (Meaningful).',
+        'Menjelaskan alur kegiatan ARKA dan menyepakati kontrak belajar: saling menghargai pendapat dan menjaga kerahasiaan teman.'
       ]
     },
     tahapInti: {
       waktu: '60 Menit',
       alurARKA: {
-        aktivitas: 'Aktivitas (Activity): Peserta didik dibagi menjadi 5 kelompok. Setiap kelompok menerima kartu studi kasus mengenai situasi pergaulan SMP (misal: pengucilan di kantin, sindiran di status WA, ejekan nama orang tua). Siswa berdiskusi dan memerankan tanggapan solutif.',
-        refleksi: 'Refleksi (Reflection): Guru BK memandu sesi curah pendapat mendalam dengan pertanyaan: "Apa yang kalian rasakan saat melihat tokoh dalam cerita diperlakukan demikian?", "Pernahkah kalian melihat kejadian serupa di sekitar kita?", "Mengapa seseorang memilih merundung temannya?"',
-        konseptualisasi: 'Konseptualisasi (Conceptualization): Guru BK menyajikan materi interaktif mengenai pilar pertemanan sehat, perbedaan candaan vs bullying, dampak psikologis pada korban, dan pentingnya menjadi "Upstander" (sahabat pelindung).',
-        aplikasi: 'Aplikasi (Application): Setiap siswa menuliskan 1 komitmen perlindungan teman di "Pohon Harmoni Kelas" dan menyepakati deklarasi bersama: "Kelas Kami, Ruang Aman untuk Semua".'
+        aktivitas: 'Aktivitas Bermakna (Meaningful Activity): Peserta didik dibagi ke dalam 5 kelompok kolaboratif. Setiap kelompok menganalisis kartu kasus dinamika pergaulan nyata di SMP (pengucilan di kantin, sindiran di status media sosial, ejekan nama orang tua) dan merancang tanggapan solutif.',
+        refleksi: 'Refleksi Kritis (Critical Reflection): Guru BK memfasilitasi dialog mendalam: "Apa yang bergejolak dalam perasaan kalian saat melihat seseorang diperlakukan tidak adil?", "Mengapa seseorang merundung orang lain?", "Bagaimana rasa empati dapat mengubah suasana kelas kita?"',
+        konseptualisasi: 'Konseptualisasi (Conceptualization): Peserta didik dan Guru BK bersama-sama mengkristalisasi konsep kunci: ciri pertemanan suportif, batasan pribadi yang sehat, dampak psikologis bullying, dan kekuatan menjadi seorang Upstander.',
+        aplikasi: 'Aplikasi / Aksi Nyata (Real Action Application): Setiap siswa merumuskan deklarasi aksi nyata pada lembar komitmen "Sahabat Harmonis" dan menempelkan ikrar kelas pada Pohon Kebaikan Kelas.'
       }
     },
     tahapPenutup: {
       waktu: '10 Menit',
       kegiatan: [
-        'Guru BK bersama 2 perwakilan peserta didik merangkum kesimpulan inti layanan hari ini.',
-        'Peserta didik mengisi Lembar Kerja Refleksi Diri 4F secara mandiri.',
-        'Guru BK menyampaikan pesan penguatan: "Perbedaan itu indah jika kita saling menjaga. Jangan ragu bercerita ke Guru BK."',
-        'Doa bersama dan penutup dengan tepuk tangan apresiasi.'
+        'Guru BK bersama perwakilan peserta didik menyimpulkan makna inti layanan hari ini (Meaningful Synthesis).',
+        'Peserta didik mengisi Lembar Refleksi Diri 4F secara jujur dan mandiri.',
+        'Guru BK menyampaikan penguatan afirmasi: "Keberagaman kita adalah kekuatan. Ruang BK selalu terbuka untuk kalian bercerita."',
+        'Doa bersama dan penutup dengan tepuk apresiasi.'
       ]
+    }
+  },
+  asesmen: {
+    asesmenProses: [
+      'Keterlibatan aktif, fokus, dan antusiasme peserta didik selama seluruh siklus alur ARKA',
+      'Terciptanya iklim kelas yang aman secara psikologis, terbuka, dan saling menghormati (Mindful & Joyful)',
+      'Kekompakan kolaborasi dan kedalaman argumentasi dalam diskusi kelompok',
+      'Kesesuaian dinamika layanan dengan alokasi waktu 2 x 40 menit'
+    ],
+    asesmenHasil: {
+      understanding: 'Peserta didik memahami secara komprehensif cara membedakan candaan wajar vs bullying serta langkah pencegahannya',
+      comfortable: 'Peserta didik menyatakan merasa lebih didengar, aman, dan berdaya di lingkungan kelas (terukur via angket reflektif)',
+      action: 'Peserta didik merumuskan rencana aksi nyata sebagai pembela teman (Upstander) dalam lembar LKPD 4F'
     }
   },
   evaluasi: {

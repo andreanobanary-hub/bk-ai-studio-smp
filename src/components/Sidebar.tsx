@@ -28,7 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'rpl' as const,
       label: 'Perencanaan (RPL BK SMP)',
-      sublabel: 'Kurikulum Merdeka • Alur ARKA',
+      sublabel: 'Deep Learning • Alur ARKA',
       icon: FileText,
       badge: 'Fase D',
     },
@@ -153,10 +153,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="p-3.5 rounded-xl bg-blue-950/40 border border-blue-800/40 text-blue-200">
             <div className="flex items-center space-x-2 text-xs font-bold text-blue-300 mb-1">
               <ShieldCheck className="w-4 h-4 text-blue-400" />
-              <span>Standar Kurikulum Merdeka</span>
+              <span>Standar Kurikulum Nasional Terbaru</span>
             </div>
             <p className="text-[11px] text-blue-300/80 leading-relaxed">
-              Memenuhi 11 Aspek SKKPD SMP, Profil Pelajar Pancasila, dan 4 Alur Experiential ARKA.
+              Memadukan Pendekatan Deep Learning (Mindful, Meaningful, Joyful), SKKPD SMP, Profil Pelajar Pancasila, dan 4 Alur ARKA.
             </p>
           </div>
         </div>

@@ -17,6 +17,11 @@ export interface RPLData {
   fungsi: 'Pemahaman' | 'Pencegahan' | 'Pengentasan' | 'Pemeliharaan/Pengembangan' | string;
   alokasiWaktu: '1 x 40 menit' | '2 x 40 menit' | string;
   pendekatan: string;
+  pendekatanDeepLearning?: {
+    mindfulLearning: string; // Pembelajaran Berkesadaran (Mindful)
+    meaningfulLearning: string; // Pembelajaran Bermakna (Meaningful)
+    joyfulLearning: string; // Pembelajaran Menyenangkan (Joyful)
+  };
   skkpd: string;
   profilPelajarPancasila: string[];
   capaianLayanan: string;
@@ -33,15 +38,23 @@ export interface RPLData {
     tahapInti: {
       waktu: string;
       alurARKA: {
-        aktivitas: string;
-        refleksi: string;
-        konseptualisasi: string;
-        aplikasi: string;
+        aktivitas: string; // Aktivitas Bermakna
+        refleksi: string; // Refleksi Kritis
+        konseptualisasi: string; // Konseptualisasi
+        aplikasi: string; // Aplikasi / Aksi Nyata
       };
     };
     tahapPenutup: {
       waktu: string;
       kegiatan: string[];
+    };
+  };
+  asesmen?: {
+    asesmenProses: string[];
+    asesmenHasil: {
+      understanding: string;
+      comfortable: string;
+      action: string;
     };
   };
   evaluasi: {

@@ -1,6 +1,6 @@
 {
   "name": "BK AI STUDIO SMP (Fase D)",
-  "description": "Ruang kerja komprehensif Guru Bimbingan dan Konseling jenjang SMP / Fase D untuk Generator RPL Kurikulum Merdeka (Alur ARKA), Asesmen Sosiometri & IKMS, LKPD Refleksi Diri 4F, serta Konsultasi Kasus Konselor.",
+  "description": "Ruang kerja komprehensif Guru Bimbingan dan Konseling jenjang SMP / Fase D untuk Generator RPL Standar Kurikulum Nasional Terbaru (Deep Learning & Alur ARKA), Asesmen Sosiometri & IKMS, LKPD Refleksi Diri 4F, serta Konsultasi Kasus Konselor.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

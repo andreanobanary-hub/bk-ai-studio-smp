@@ -122,6 +122,7 @@ export const RPLView: React.FC<RPLViewProps> = ({
   const handleCopyText = () => {
     const textContent = `
 RENCANA PELAKSANAAN LAYANAN (RPL) BIMBINGAN KLASIKAL
+STANDAR KURIKULUM NASIONAL TERBARU (DEEP LEARNING)
 SATUAN PENDIDIKAN : ${profile.namaSekolah}
 FASE / KELAS      : Fase D / ${rplData.kelas}
 SEMESTER / T.A.   : ${profile.semester} / ${profile.tahunPelajaran}
@@ -131,11 +132,18 @@ ALOKASI WAKTU     : ${rplData.alokasiWaktu}
 TOPIK / MATERI    : ${rplData.topik}
 PENDEKATAN        : ${rplData.pendekatan}
 
-A. STANDAR KOMPETENSI KEMANDIRIAN PESERTA DIDIK (SKKPD SMP)
-${rplData.skkpd}
+A. CAPAIAN LAYANAN BK (FASE D SMP) & SKKPD
+Capaian Layanan: ${rplData.capaianLayanan}
+SKKPD SMP      : ${rplData.skkpd}
+Profil Pelajar Pancasila: ${rplData.profilPelajarPancasila?.join(', ')}
 
-B. PROFIL PELAJAR PANCASILA
-${rplData.profilPelajarPancasila?.join(', ')}
+B. PENDEKATAN DEEP LEARNING (3 PILAR PEMBELAJARAN MENDALAM)
+1. Mindful Learning (Pembelajaran Berkesadaran):
+${rplData.pendekatanDeepLearning?.mindfulLearning || '- Mengembangkan kesadaran penuh dan fokus emosional konseli.'}
+2. Meaningful Learning (Pembelajaran Bermakna):
+${rplData.pendekatanDeepLearning?.meaningfulLearning || '- Mengaitkan materi dengan pengalaman nyata kehidupan remaja SMP.'}
+3. Joyful Learning (Pembelajaran Menyenangkan):
+${rplData.pendekatanDeepLearning?.joyfulLearning || '- Menciptakan iklim bimbingan aman secara psikologis dan menggembirakan.'}
 
 C. TUJUAN LAYANAN
 1. Tujuan Umum: ${rplData.tujuanUmum}
@@ -146,24 +154,26 @@ D. METODE & MEDIA
 Metode : ${rplData.metode}
 Media  : ${rplData.mediaDanAlat}
 
-E. LANGKAH-LANGKAH KEGIATAN (ALUR ARKA)
+E. LANGKAH-LANGKAH KEGIATAN BERBASIS ALUR ARKA
 1. TAHAP AWAL / PENDAHULUAN (${rplData.langkahKegiatan?.tahapAwal?.waktu})
 ${rplData.langkahKegiatan?.tahapAwal?.kegiatan?.map((k, i) => `${i + 1}. ${k}`).join('\n')}
 
 2. TAHAP INTI (ALUR ARKA) (${rplData.langkahKegiatan?.tahapInti?.waktu})
-- Aktivitas (Activity): ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aktivitas}
-- Refleksi (Reflection): ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.refleksi}
+- Aktivitas Bermakna (Meaningful Activity): ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aktivitas}
+- Refleksi Kritis (Critical Reflection): ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.refleksi}
 - Konseptualisasi (Conceptualization): ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.konseptualisasi}
-- Aplikasi (Application): ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aplikasi}
+- Aplikasi / Aksi Nyata (Real Action Application): ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aplikasi}
 
 3. TAHAP PENUTUP (${rplData.langkahKegiatan?.tahapPenutup?.waktu})
 ${rplData.langkahKegiatan?.tahapPenutup?.kegiatan?.map((k, i) => `${i + 1}. ${k}`).join('\n')}
 
-F. EVALUASI & TINDAK LANJUT
-1. Evaluasi Proses:
-${rplData.evaluasi?.evaluasiProses?.map((e) => `- ${e}`).join('\n')}
-2. Evaluasi Hasil:
-${rplData.evaluasi?.evaluasiHasil?.map((e) => `- ${e}`).join('\n')}
+F. ASESMEN PROSES & ASESMEN HASIL
+1. Asesmen Proses (Keterlaksanaan Layanan):
+${(rplData.asesmen?.asesmenProses || rplData.evaluasi?.evaluasiProses)?.map((e) => `- ${e}`).join('\n')}
+2. Asesmen Hasil (Refleksi Ketercapaian Konseli):
+- Understanding : ${rplData.asesmen?.asesmenHasil?.understanding || rplData.evaluasi?.evaluasiHasil?.[0] || 'Pemahaman baru konseli'}
+- Comfortable   : ${rplData.asesmen?.asesmenHasil?.comfortable || rplData.evaluasi?.evaluasiHasil?.[1] || 'Kenyamanan dan rasa aman konseli'}
+- Action        : ${rplData.asesmen?.asesmenHasil?.action || rplData.evaluasi?.evaluasiHasil?.[2] || 'Rencana aksi nyata'}
 Tindak Lanjut: ${rplData.tindakLanjut}
 
 ${profile.kota}, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -175,38 +185,44 @@ Guru Bimbingan dan Konseling: ${profile.namaGuruBK} (NIP. ${profile.nipGuruBK ||
 
     navigator.clipboard.writeText(textContent);
     setCopied(true);
-    onShowToast('Dokumen RPL berhasil disalin ke Clipboard!');
+    onShowToast('Dokumen RPL Standar Deep Learning berhasil disalin!');
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownloadDoc = () => {
     const textContent = `
 RENCANA PELAKSANAAN LAYANAN (RPL) BIMBINGAN KLASIKAL
+STANDAR KURIKULUM NASIONAL TERBARU (DEEP LEARNING)
 SEKOLAH : ${profile.namaSekolah}
 TOPIK   : ${rplData.topik}
 SASARAN : ${rplData.kelas} (Fase D SMP)
 
-A. SKKPD SMP:
-${rplData.skkpd}
+A. CAPAIAN LAYANAN & SKKPD:
+Capaian : ${rplData.capaianLayanan}
+SKKPD   : ${rplData.skkpd}
 
-B. TUJUAN KHUSUS:
+B. PENDEKATAN DEEP LEARNING:
+1. Mindful Learning    : ${rplData.pendekatanDeepLearning?.mindfulLearning || '-'}
+2. Meaningful Learning : ${rplData.pendekatanDeepLearning?.meaningfulLearning || '-'}
+3. Joyful Learning     : ${rplData.pendekatanDeepLearning?.joyfulLearning || '-'}
+
+C. TUJUAN KHUSUS:
 ${rplData.tujuanKhusus?.join('\n')}
 
-C. LANGKAH ARKA:
-1. Aktivitas: ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aktivitas}
-2. Refleksi: ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.refleksi}
-3. Konseptualisasi: ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.konseptualisasi}
-4. Aplikasi: ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aplikasi}
+D. LANGKAH ARKA:
+1. Aktivitas Bermakna   : ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aktivitas}
+2. Refleksi Kritis      : ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.refleksi}
+3. Konseptualisasi      : ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.konseptualisasi}
+4. Aplikasi / Aksi Nyata: ${rplData.langkahKegiatan?.tahapInti?.alurARKA?.aplikasi}
 
-D. EVALUASI:
-${rplData.evaluasi?.evaluasiProses?.join('\n')}
-${rplData.evaluasi?.evaluasiHasil?.join('\n')}
+E. ASESMEN PROSES & HASIL:
+${(rplData.asesmen?.asesmenProses || rplData.evaluasi?.evaluasiProses)?.join('\n')}
     `.trim();
 
     const element = document.createElement('a');
     const file = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
     element.href = URL.createObjectURL(file);
-    element.download = `RPL_BK_SMP_${rplData.kelas.replace(/\s+/g, '_')}_${rplData.topik.slice(0, 20).replace(/\s+/g, '_')}.txt`;
+    element.download = `RPL_DeepLearning_SMP_${rplData.kelas.replace(/\s+/g, '_')}_${rplData.topik.slice(0, 20).replace(/\s+/g, '_')}.txt`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -222,13 +238,13 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
           <div className="space-y-1.5 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Generator RPL Berbasis Kurikulum Merdeka (Fase D SMP)</span>
+              <span>Standar Kurikulum Nasional Terbaru (Deep Learning • Fase D SMP)</span>
             </div>
             <h2 className="text-xl lg:text-2xl font-black tracking-tight text-white">
-              Penyusun Dokumen Bimbingan Klasikal Alur ARKA
+              Penyusun Dokumen Bimbingan Klasikal Deep Learning & Alur ARKA
             </h2>
             <p className="text-xs lg:text-sm text-slate-300 leading-relaxed">
-              Secara otomatis merumuskan SKKPD SMP, Profil Pelajar Pancasila, 4 siklus belajar ARKA (Aktivitas, Refleksi, Konseptualisasi, Aplikasi), dan rubrik evaluasi proses-hasil resmi.
+              Memadukan 3 Pilar Deep Learning (Mindful, Meaningful, Joyful Learning), Alur ARKA (Aktivitas Bermakna, Refleksi Kritis, Konseptualisasi, Aksi Nyata), Capaian Layanan BK Fase D, serta Asesmen Proses & Hasil.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -401,10 +417,20 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                 6. Model Pendekatan
               </label>
-              <div className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-700 flex items-center space-x-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="truncate">Alur ARKA Kurmer</span>
+              <div className="p-2 bg-blue-50/70 border border-blue-200 rounded-lg text-[11px] font-semibold text-blue-900 flex items-center space-x-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                <span className="truncate">Deep Learning • Alur ARKA</span>
               </div>
+            </div>
+          </div>
+
+          {/* Deep Learning 3 Pillars hint */}
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1">
+            <span className="font-bold text-slate-800 block">3 Pilar Deep Learning BK SMP:</span>
+            <div className="grid grid-cols-3 gap-1 text-[10px] text-center font-semibold">
+              <span className="bg-white border border-slate-200 p-1 rounded text-blue-700">Mindful Learning</span>
+              <span className="bg-white border border-slate-200 p-1 rounded text-indigo-700">Meaningful Learning</span>
+              <span className="bg-white border border-slate-200 p-1 rounded text-emerald-700">Joyful Learning</span>
             </div>
           </div>
 
@@ -465,7 +491,7 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
           <div className="no-print flex items-center justify-between bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
             <div className="flex items-center space-x-2 text-xs font-bold text-slate-700">
               <FileCheck className="w-4 h-4 text-blue-600" />
-              <span>Pratinjau Dokumen Resmi Standar Kurikulum Merdeka</span>
+              <span>Pratinjau Dokumen Resmi Standar Kurikulum Nasional Terbaru</span>
             </div>
             <div className="flex items-center space-x-2">
               <button
@@ -508,10 +534,13 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
               <p className="text-xs text-slate-600 font-medium">
                 Unit Bimbingan dan Konseling (BK) • Jenjang Sekolah Menengah Pertama (SMP)
               </p>
-              <div className="pt-2">
-                <span className="inline-block px-4 py-1 rounded-md bg-slate-100 border border-slate-300 text-xs font-black tracking-wider uppercase text-slate-900">
-                  Rencana Pelaksanaan Layanan (RPL) Bimbingan Klasikal
+              <div className="pt-2 space-y-1">
+                <span className="inline-block px-3.5 py-0.5 rounded-full bg-blue-50 border border-blue-300 text-[11px] font-black tracking-wider uppercase text-blue-900">
+                  Standar Kurikulum Nasional Terbaru • Fase D SMP
                 </span>
+                <div className="text-sm md:text-base font-black tracking-wide uppercase text-slate-900">
+                  Rencana Pelaksanaan Layanan (RPL) Bimbingan Klasikal (Deep Learning)
+                </div>
               </div>
             </div>
 
@@ -546,72 +575,119 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
                   <tr className="divide-x divide-slate-200">
                     <td className="p-2.5 font-bold bg-slate-50 text-slate-700">Model & Pendekatan</td>
                     <td colSpan={3} className="p-2.5 text-slate-800">
-                      Experiential Learning berbasis <span className="font-bold text-indigo-700">{rplData.pendekatan}</span>
+                      <span className="font-bold text-blue-700">Pendekatan Deep Learning</span> (Mindful, Meaningful, Joyful Learning) berbasis <span className="font-bold text-indigo-700">Alur ARKA</span>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
-            {/* A. SKKPD & Profil Pelajar Pancasila */}
+            {/* A. Capaian Layanan & SKKPD */}
             <div className="space-y-3">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5">
-                A. Standar Kompetensi Kemandirian (SKKPD SMP) & Profil Pelajar Pancasila
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                  <div className="font-bold text-slate-800 mb-1">Aspek Perkembangan SKKPD SMP:</div>
-                  <p className="text-slate-700 leading-relaxed">{rplData.skkpd}</p>
-                </div>
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                  <div className="font-bold text-slate-800 mb-1">Dimensi Profil Pelajar Pancasila:</div>
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    {rplData.profilPelajarPancasila?.map((dim, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 rounded-md bg-white border border-slate-300 font-semibold text-slate-800 text-[11px]"
-                      >
-                        ✓ {dim}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* B. Capaian Layanan & Tujuan */}
-            <div className="space-y-3">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5">
-                B. Capaian Layanan & Tujuan Pembelajaran BK
+                A. Capaian Layanan BK (Fase D SMP) & Standar Kompetensi Kemandirian (SKKPD)
               </h3>
               <div className="text-xs space-y-2.5">
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                  <span className="font-bold text-slate-800">Capaian Layanan (Fase D): </span>
-                  <span className="text-slate-700">{rplData.capaianLayanan}</span>
+                <div className="p-3 bg-blue-50/50 border border-blue-200 rounded-lg">
+                  <span className="font-bold text-blue-900">Capaian Layanan BK (Fase D): </span>
+                  <span className="text-slate-800 leading-relaxed">{rplData.capaianLayanan}</span>
                 </div>
-                <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-2">
-                  <div>
-                    <span className="font-bold text-slate-800">1. Tujuan Umum: </span>
-                    <span className="text-slate-700">{rplData.tujuanUmum}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                    <div className="font-bold text-slate-800 mb-1">Aspek Perkembangan SKKPD SMP:</div>
+                    <p className="text-slate-700 leading-relaxed">{rplData.skkpd}</p>
                   </div>
-                  <div>
-                    <div className="font-bold text-slate-800 mb-1">2. Tujuan Khusus (Operasional):</div>
-                    <ul className="space-y-1 pl-4 text-slate-700">
-                      {rplData.tujuanKhusus?.map((tj, idx) => (
-                        <li key={idx} className="list-disc leading-relaxed">
-                          {tj}
-                        </li>
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                    <div className="font-bold text-slate-800 mb-1">Dimensi Profil Pelajar Pancasila:</div>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {rplData.profilPelajarPancasila?.map((dim, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 rounded-md bg-white border border-slate-300 font-semibold text-slate-800 text-[11px]"
+                        >
+                          ✓ {dim}
+                        </span>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* C. Materi, Media, dan Metode */}
+            {/* B. Pendekatan Deep Learning (3 Pilar) */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-indigo-600 pl-2.5">
+                B. Penerapan Pendekatan Deep Learning (3 Pilar Pembelajaran Mendalam)
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                {/* 1. Mindful */}
+                <div className="p-3 rounded-lg bg-blue-50/80 border border-blue-200 space-y-1">
+                  <div className="font-black text-blue-900 flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">1</span>
+                    <span>Mindful Learning</span>
+                  </div>
+                  <div className="text-[11px] font-semibold text-blue-700">Pembelajaran Berkesadaran</div>
+                  <p className="text-slate-700 text-[11px] leading-relaxed pt-1">
+                    {rplData.pendekatanDeepLearning?.mindfulLearning ||
+                      'Mengembangkan kesadaran penuh (Mindfulness) peserta didik dalam mengenali emosi diri, atensi fokus, dan kepekaan rasa saat menghadapi masalah.'}
+                  </p>
+                </div>
+
+                {/* 2. Meaningful */}
+                <div className="p-3 rounded-lg bg-indigo-50/80 border border-indigo-200 space-y-1">
+                  <div className="font-black text-indigo-900 flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px]">2</span>
+                    <span>Meaningful Learning</span>
+                  </div>
+                  <div className="text-[11px] font-semibold text-indigo-700">Pembelajaran Bermakna</div>
+                  <p className="text-slate-700 text-[11px] leading-relaxed pt-1">
+                    {rplData.pendekatanDeepLearning?.meaningfulLearning ||
+                      'Menghubungkan esensi materi bimbingan dengan pengalaman hidup nyata peserta didik di jenjang SMP sehingga menumbuhkan hikmah dan nilai batin.'}
+                  </p>
+                </div>
+
+                {/* 3. Joyful */}
+                <div className="p-3 rounded-lg bg-emerald-50/80 border border-emerald-200 space-y-1">
+                  <div className="font-black text-emerald-900 flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">3</span>
+                    <span>Joyful Learning</span>
+                  </div>
+                  <div className="text-[11px] font-semibold text-emerald-700">Pembelajaran Menyenangkan</div>
+                  <p className="text-slate-700 text-[11px] leading-relaxed pt-1">
+                    {rplData.pendekatanDeepLearning?.joyfulLearning ||
+                      'Menciptakan iklim bimbingan yang aman secara psikologis, bebas perundungan, interaktif, dan penuh kegembiraan dalam dinamika kelompok.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* C. Tujuan Pembelajaran BK */}
             <div className="space-y-3">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5">
-                C. Pokok Materi, Media, dan Metode Layanan
+                C. Tujuan Layanan Bimbingan Klasikal
+              </h3>
+              <div className="text-xs space-y-2 bg-white border border-slate-200 rounded-lg p-3">
+                <div>
+                  <span className="font-bold text-slate-800">1. Tujuan Umum: </span>
+                  <span className="text-slate-700">{rplData.tujuanUmum}</span>
+                </div>
+                <div>
+                  <div className="font-bold text-slate-800 mb-1">2. Tujuan Khusus (Operasional & Terukur):</div>
+                  <ul className="space-y-1 pl-4 text-slate-700">
+                    {rplData.tujuanKhusus?.map((tj, idx) => (
+                      <li key={idx} className="list-disc leading-relaxed">
+                        {tj}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* D. Materi, Media, dan Metode */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5">
+                D. Pokok Materi, Media, dan Metode Layanan
               </h3>
               <div className="text-xs grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
@@ -635,17 +711,17 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
               </div>
             </div>
 
-            {/* D. Langkah-Langkah Kegiatan Alur ARKA */}
+            {/* E. Langkah-Langkah Kegiatan Alur ARKA */}
             <div className="space-y-3">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-indigo-600 pl-2.5">
-                D. Langkah-Langkah Kegiatan Layanan (Alur ARKA)
+                E. Langkah-Langkah Pelaksanaan Layanan (Alur ARKA)
               </h3>
 
               <div className="space-y-3 text-xs">
                 {/* 1. Tahap Awal */}
                 <div className="border border-slate-200 rounded-lg overflow-hidden">
                   <div className="bg-slate-100 px-3 py-1.5 font-bold text-slate-800 flex justify-between">
-                    <span>1. Tahap Pendahuluan / Awal</span>
+                    <span>1. Tahap Pendahuluan / Awal (Pengondisian Mindful & Joyful)</span>
                     <span className="text-slate-600 font-normal">{rplData.langkahKegiatan?.tahapAwal?.waktu}</span>
                   </div>
                   <div className="p-3 space-y-1.5 bg-white">
@@ -661,26 +737,26 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
                 {/* 2. Tahap Inti (ARKA) */}
                 <div className="border border-indigo-200 rounded-lg overflow-hidden">
                   <div className="bg-indigo-50 px-3 py-1.5 font-bold text-indigo-900 flex justify-between border-b border-indigo-100">
-                    <span>2. Tahap Inti (Model Experiential Learning Alur ARKA)</span>
+                    <span>2. Tahap Inti (Siklus Pembelajaran Mendalam Alur ARKA)</span>
                     <span className="text-indigo-700 font-semibold">{rplData.langkahKegiatan?.tahapInti?.waktu}</span>
                   </div>
                   <div className="p-3.5 space-y-3 bg-white">
-                    {/* A - Aktivitas */}
+                    {/* A - Aktivitas Bermakna */}
                     <div className="p-2.5 rounded-lg bg-blue-50/70 border border-blue-100">
                       <div className="font-bold text-blue-900 flex items-center gap-1.5 mb-1">
                         <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">A</span>
-                        <span>Aktivitas (Activity)</span>
+                        <span>Aktivitas Bermakna (Meaningful Activity)</span>
                       </div>
                       <p className="text-slate-700 pl-6 leading-relaxed">
                         {rplData.langkahKegiatan?.tahapInti?.alurARKA?.aktivitas}
                       </p>
                     </div>
 
-                    {/* R - Refleksi */}
+                    {/* R - Refleksi Kritis */}
                     <div className="p-2.5 rounded-lg bg-amber-50/70 border border-amber-100">
                       <div className="font-bold text-amber-900 flex items-center gap-1.5 mb-1">
                         <span className="w-5 h-5 rounded-full bg-amber-600 text-white flex items-center justify-center text-[10px]">R</span>
-                        <span>Refleksi (Reflection)</span>
+                        <span>Refleksi Kritis (Critical Reflection)</span>
                       </div>
                       <p className="text-slate-700 pl-6 leading-relaxed">
                         {rplData.langkahKegiatan?.tahapInti?.alurARKA?.refleksi}
@@ -698,11 +774,11 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
                       </p>
                     </div>
 
-                    {/* A - Aplikasi */}
+                    {/* A - Aplikasi / Aksi Nyata */}
                     <div className="p-2.5 rounded-lg bg-purple-50/70 border border-purple-100">
                       <div className="font-bold text-purple-900 flex items-center gap-1.5 mb-1">
                         <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-[10px]">A</span>
-                        <span>Aplikasi (Application)</span>
+                        <span>Aplikasi / Aksi Nyata (Real Action Application)</span>
                       </div>
                       <p className="text-slate-700 pl-6 leading-relaxed">
                         {rplData.langkahKegiatan?.tahapInti?.alurARKA?.aplikasi}
@@ -714,7 +790,7 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
                 {/* 3. Tahap Penutup */}
                 <div className="border border-slate-200 rounded-lg overflow-hidden">
                   <div className="bg-slate-100 px-3 py-1.5 font-bold text-slate-800 flex justify-between">
-                    <span>3. Tahap Penutup</span>
+                    <span>3. Tahap Penutup (Sintesis Makna & Penguatan Afirmasi)</span>
                     <span className="text-slate-600 font-normal">{rplData.langkahKegiatan?.tahapPenutup?.waktu}</span>
                   </div>
                   <div className="p-3 space-y-1.5 bg-white">
@@ -729,31 +805,43 @@ ${rplData.evaluasi?.evaluasiHasil?.join('\n')}
               </div>
             </div>
 
-            {/* E. Evaluasi dan Tindak Lanjut */}
+            {/* F. Asesmen Proses & Hasil */}
             <div className="space-y-3">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 border-l-4 border-blue-600 pl-2.5">
-                E. Evaluasi Layanan & Rencana Tindak Lanjut
+                F. Asesmen Proses & Asesmen Hasil (Format Evaluasi Keterlaksanaan)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                  <div className="font-bold text-slate-800 mb-1.5">1. Evaluasi Proses:</div>
-                  <ul className="space-y-1 pl-4 text-slate-700">
-                    {rplData.evaluasi?.evaluasiProses?.map((ep, i) => (
+                {/* Asesmen Proses */}
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                  <div className="font-bold text-slate-900">1. Asesmen Proses (Observasi Keterlaksanaan):</div>
+                  <ul className="space-y-1.5 pl-4 text-slate-700">
+                    {(rplData.asesmen?.asesmenProses || rplData.evaluasi?.evaluasiProses)?.map((ep, i) => (
                       <li key={i} className="list-disc leading-relaxed">{ep}</li>
                     ))}
                   </ul>
                 </div>
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                  <div className="font-bold text-slate-800 mb-1.5">2. Evaluasi Hasil:</div>
-                  <ul className="space-y-1 pl-4 text-slate-700">
-                    {rplData.evaluasi?.evaluasiHasil?.map((eh, i) => (
-                      <li key={i} className="list-disc leading-relaxed">{eh}</li>
-                    ))}
-                  </ul>
+
+                {/* Asesmen Hasil */}
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+                  <div className="font-bold text-slate-900">2. Asesmen Hasil (Refleksi Ketercapaian Konseli):</div>
+                  <div className="space-y-1.5 text-[11px] text-slate-700">
+                    <div className="p-1.5 bg-white rounded border border-slate-200">
+                      <span className="font-bold text-blue-800">Understanding (U): </span>
+                      <span>{rplData.asesmen?.asesmenHasil?.understanding || rplData.evaluasi?.evaluasiHasil?.[0] || 'Pemahaman konsep konseli'}</span>
+                    </div>
+                    <div className="p-1.5 bg-white rounded border border-slate-200">
+                      <span className="font-bold text-indigo-800">Comfortable (C): </span>
+                      <span>{rplData.asesmen?.asesmenHasil?.comfortable || rplData.evaluasi?.evaluasiHasil?.[1] || 'Kenyamanan dan penerimaan emosional'}</span>
+                    </div>
+                    <div className="p-1.5 bg-white rounded border border-slate-200">
+                      <span className="font-bold text-emerald-800">Action (A): </span>
+                      <span>{rplData.asesmen?.asesmenHasil?.action || rplData.evaluasi?.evaluasiHasil?.[2] || 'Rencana aksi nyata pada LKPD 4F'}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                <span className="font-bold text-slate-800">Tindak Lanjut: </span>
+                <span className="font-bold text-slate-800">Rencana Tindak Lanjut: </span>
                 <span className="text-slate-700">{rplData.tindakLanjut}</span>
               </div>
             </div>
