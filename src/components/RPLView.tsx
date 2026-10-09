@@ -135,7 +135,7 @@ PENDEKATAN        : ${rplData.pendekatan}
 A. CAPAIAN LAYANAN BK (FASE D SMP) & SKKPD
 Capaian Layanan: ${rplData.capaianLayanan}
 SKKPD SMP      : ${rplData.skkpd}
-Profil Pelajar Pancasila: ${rplData.profilPelajarPancasila?.join(', ')}
+Dimensi Pembelajaran Mendalam (Deep Learning): ${(rplData.dimensiDeepLearning || rplData.profilPelajarPancasila)?.join(', ')}
 
 B. PENDEKATAN DEEP LEARNING (3 PILAR PEMBELAJARAN MENDALAM)
 1. Mindful Learning (Pembelajaran Berkesadaran):
@@ -598,9 +598,9 @@ ${(rplData.asesmen?.asesmenProses || rplData.evaluasi?.evaluasiProses)?.join('\n
                     <p className="text-slate-700 leading-relaxed">{rplData.skkpd}</p>
                   </div>
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg">
-                    <div className="font-bold text-slate-800 mb-1">Dimensi Profil Pelajar Pancasila:</div>
+                    <div className="font-bold text-slate-800 mb-1">Dimensi Pembelajaran Mendalam (Deep Learning):</div>
                     <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {rplData.profilPelajarPancasila?.map((dim, idx) => (
+                      {(rplData.dimensiDeepLearning || rplData.profilPelajarPancasila)?.map((dim, idx) => (
                         <span
                           key={idx}
                           className="px-2 py-0.5 rounded-md bg-white border border-slate-300 font-semibold text-slate-800 text-[11px]"

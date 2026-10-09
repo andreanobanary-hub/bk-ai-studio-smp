@@ -100,7 +100,12 @@ export const DEFAULT_RPL: RPLData = {
     joyfulLearning: 'Menciptakan ruang bimbingan yang aman secara psikologis, bebas perundungan, interaktif, dan menggembirakan melalui dinamika kelompok yang positif.'
   },
   skkpd: 'Kematangan Hubungan dengan Teman Sebaya (Mampu membina relasi yang sehat, menghargai keberagaman, dan menunjukkan aksi nyata pencegahan perundungan)',
-  profilPelajarPancasila: ['Bergotong Royong', 'Bernalar Kritis', 'Mandiri'],
+  dimensiDeepLearning: [
+    'Karakter (Character)',
+    'Kolaborasi (Collaboration)',
+    'Komunikasi (Communication)',
+    'Berpikir Kritis (Critical Thinking)',
+  ],
   capaianLayanan: 'Peserta didik mampu memahami hakikat relasi pertemanan yang positif, mengidentifikasi faktor risiko interaksi yang merugikan (bullying fisik, verbal, relasional, maupun cyberbullying), serta menunjukkan perilaku saling menghargai, komunikasi asertif, dan kepedulian sosial di lingkungan kelas.',
   tujuanUmum: 'Peserta didik kelas 7 SMP mampu membangun relasi pertemanan yang suportif, saling menghargai perbedaan, dan memiliki keberanian moral menolak tindakan bullying melalui pembiasaan kesadaran diri dan empati mendalam.',
   tujuanKhusus: [

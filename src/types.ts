@@ -23,7 +23,8 @@ export interface RPLData {
     joyfulLearning: string; // Pembelajaran Menyenangkan (Joyful)
   };
   skkpd: string;
-  profilPelajarPancasila: string[];
+  dimensiDeepLearning: string[]; // Dimensi Pembelajaran Mendalam (6C): Karakter, Kewarganegaraan, Kolaborasi, Komunikasi, Kreativitas, Berpikir Kritis
+  profilPelajarPancasila?: string[];
   capaianLayanan: string;
   tujuanUmum: string;
   tujuanKhusus: string[];

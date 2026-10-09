@@ -42,7 +42,7 @@ export async function generateRPLClient(params: {
   const { kelas, bidang, fungsi, topik, alokasiWaktu, pendekatan, tujuanTambahan } = params;
   const ai = getGeminiClient();
 
-  const systemPrompt = `Anda adalah Dosen Ahli dan Konselor Senior Bimbingan dan Konseling (BK) jenjang Sekolah Menengah Pertama (SMP) / Fase D di Indonesia yang menguasai Standar Kurikulum Nasional Terbaru (Pendekatan Deep Learning: Mindful, Meaningful, dan Joyful Learning; Permendikbudristek Layanan BK SMP Fase D), Standar Kompetensi Kemandirian Peserta Didik (SKKPD SMP), dan Alur ARKA (Aktivitas Bermakna, Refleksi Kritis, Konseptualisasi, dan Aplikasi/Aksi Nyata).
+  const systemPrompt = `Anda adalah Dosen Ahli dan Konselor Senior Bimbingan dan Konseling (BK) jenjang Sekolah Menengah Pertama (SMP) / Fase D di Indonesia yang menguasai Standar Kurikulum Nasional Terbaru (Pendekatan Deep Learning: Mindful, Meaningful, dan Joyful Learning; Dimensi Pembelajaran Mendalam 6C: Karakter, Kewarganegaraan, Kolaborasi, Komunikasi, Kreativitas, Berpikir Kritis; Permendikbudristek Layanan BK SMP Fase D), Standar Kompetensi Kemandirian Peserta Didik (SKKPD SMP), dan Alur ARKA (Aktivitas Bermakna, Refleksi Kritis, Konseptualisasi, dan Aplikasi/Aksi Nyata).
 Tugas Anda adalah menghasilkan dokumen Rencana Pelaksanaan Layanan (RPL) Bimbingan Klasikal resmi, operasional, berorientasi Deep Learning, dan siap cetak. Output HARUS berupa format JSON murni tanpa markdown codeblock backticks jika memungkinkan, atau JSON valid.`;
 
   const userPrompt = `Buatkan RPL Bimbingan Klasikal SMP Fase D yang komprehensif berstandar Kurikulum Nasional Terbaru (Deep Learning) dengan parameter berikut:
@@ -69,7 +69,7 @@ Format output JSON harus memiliki struktur:
     "joyfulLearning": string // Uraian penerapan Joyful Learning (Pembelajaran Menyenangkan: iklim psikologis aman, positif, menggugah antusiasme)
   },
   "skkpd": string, // Aspek perkembangan SKKPD SMP yang relevan dan definisinya
-  "profilPelajarPancasila": string[], // 2-3 dimensi Profil Pelajar Pancasila yang relevan
+  "dimensiDeepLearning": string[], // Pilih 2-4 dimensi dari 6C Pembelajaran Mendalam yang paling relevan dengan materi BK ini: 'Karakter (Character)', 'Kewarganegaraan (Citizenship)', 'Kolaborasi (Collaboration)', 'Komunikasi (Communication)', 'Kreativitas (Creativity)', 'Berpikir Kritis (Critical Thinking)'
   "capaianLayanan": string, // Capaian layanan BK fase D yang sesuai
   "tujuanUmum": string,
   "tujuanKhusus": string[], // 3 butir (Kognitif C4, Afektif A3, Psikomotorik P3)

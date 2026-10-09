@@ -156,7 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span>Standar Kurikulum Nasional Terbaru</span>
             </div>
             <p className="text-[11px] text-blue-300/80 leading-relaxed">
-              Memadukan Pendekatan Deep Learning (Mindful, Meaningful, Joyful), SKKPD SMP, Profil Pelajar Pancasila, dan 4 Alur ARKA.
+              Memadukan Pendekatan Deep Learning (3 Pilar & Dimensi 6C), SKKPD SMP, dan 4 Alur ARKA.
             </p>
           </div>
         </div>
