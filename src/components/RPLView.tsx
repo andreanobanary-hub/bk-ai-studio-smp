@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { RPLData, SchoolProfile } from '../types';
 import { TOPIK_PRESET_SMP } from '../data/constants';
+import { generateRPLClient, getActiveApiKey } from '../services/geminiClient';
 import {
   Sparkles,
   Printer,
@@ -14,6 +15,7 @@ import {
   Download,
   AlertCircle,
   Lightbulb,
+  Key,
 } from 'lucide-react';
 
 interface RPLViewProps {
@@ -23,6 +25,7 @@ interface RPLViewProps {
   searchFilter: string;
   onNavigateToLKPD: () => void;
   onShowToast: (msg: string) => void;
+  onOpenApiKeyModal?: () => void;
 }
 
 export const RPLView: React.FC<RPLViewProps> = ({
@@ -32,6 +35,7 @@ export const RPLView: React.FC<RPLViewProps> = ({
   searchFilter,
   onNavigateToLKPD,
   onShowToast,
+  onOpenApiKeyModal,
 }) => {
   // Form states
   const [kelas, setKelas] = useState<string>(rplData.kelas || 'Kelas 7 SMP');
@@ -82,34 +86,34 @@ export const RPLView: React.FC<RPLViewProps> = ({
       return;
     }
 
+    const apiKey = getActiveApiKey();
+    if (!apiKey) {
+      onShowToast('Silakan masukkan Gemini API Key terlebih dahulu di pojok kanan atas.');
+      if (onOpenApiKeyModal) {
+        onOpenApiKeyModal();
+      }
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await fetch('/api/generate-rpl', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          kelas,
-          bidang,
-          fungsi,
-          topik,
-          alokasiWaktu,
-          pendekatan,
-          tujuanTambahan: catatanKhusus,
-        }),
+      const generatedRpl = await generateRPLClient({
+        kelas,
+        bidang,
+        fungsi,
+        topik,
+        alokasiWaktu,
+        pendekatan,
+        tujuanTambahan: catatanKhusus,
       });
 
-      if (!response.ok) {
-        throw new Error('Gagal menghubungi AI service');
-      }
-
-      const data = await response.json();
-      if (data.rpl) {
-        setRplData(data.rpl);
-        onShowToast('Dokumen RPL Bimbingan Klasikal berhasil disusun!');
+      if (generatedRpl) {
+        setRplData(generatedRpl);
+        onShowToast('Dokumen RPL Bimbingan Klasikal berhasil disusun via Gemini SDK!');
       }
     } catch (err: any) {
-      console.error(err);
-      onShowToast('Terjadi kendala jaringan, menggunakan susunan kurikulum standar');
+      console.error('Error generating RPL via Client Gen AI SDK:', err);
+      onShowToast(`Gagal: ${err.message || 'Periksa API Key atau coba lagi'}`);
     } finally {
       setIsLoading(false);
     }

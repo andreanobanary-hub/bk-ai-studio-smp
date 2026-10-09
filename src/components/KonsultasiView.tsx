@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SchoolProfile, CaseAnalysis } from '../types';
 import { PRESET_KASUS_KONSELOR } from '../data/constants';
+import { consultCaseClient, getActiveApiKey } from '../services/geminiClient';
 import {
   MessageSquareHeart,
   Sparkles,
@@ -19,11 +20,13 @@ import {
 interface KonsultasiViewProps {
   profile: SchoolProfile;
   onShowToast: (msg: string) => void;
+  onOpenApiKeyModal?: () => void;
 }
 
 export const KonsultasiView: React.FC<KonsultasiViewProps> = ({
   profile,
   onShowToast,
+  onOpenApiKeyModal,
 }) => {
   const [kelas, setKelas] = useState<string>('Kelas 8 SMP');
   const [bidang, setBidang] = useState<string>('Sosial');
@@ -95,26 +98,25 @@ export const KonsultasiView: React.FC<KonsultasiViewProps> = ({
       return;
     }
 
+    const apiKey = getActiveApiKey();
+    if (!apiKey) {
+      onShowToast('Silakan masukkan Gemini API Key terlebih dahulu di pojok kanan atas.');
+      if (onOpenApiKeyModal) {
+        onOpenApiKeyModal();
+      }
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await fetch('/api/consult-case', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kasus, kelas, bidang, fokus }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Gagal menghubungi AI service');
-      }
-
-      const data = await response.json();
-      if (data.analysis) {
-        setAnalysis(data.analysis);
-        onShowToast('Analisis kasus dan strategi konseling berhasil disusun!');
+      const result = await consultCaseClient({ kasus, kelas, bidang, fokus });
+      if (result) {
+        setAnalysis(result);
+        onShowToast('Analisis kasus dan strategi konseling berhasil disusun via Gemini SDK!');
       }
     } catch (err: any) {
-      console.error(err);
-      onShowToast('Gagal memproses AI konsultasi kasus');
+      console.error('Error in case consultation via Client SDK:', err);
+      onShowToast(`Gagal: ${err.message || 'Periksa API Key atau coba lagi'}`);
     } finally {
       setIsLoading(false);
     }

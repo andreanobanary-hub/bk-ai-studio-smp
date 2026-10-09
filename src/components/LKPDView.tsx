@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SchoolProfile, LKPDData } from '../types';
+import { generateLKPDClient, getActiveApiKey } from '../services/geminiClient';
 import {
   Sparkles,
   Printer,
@@ -19,6 +20,7 @@ interface LKPDViewProps {
   currentTopikRPL: string;
   currentKelasRPL: string;
   onShowToast: (msg: string) => void;
+  onOpenApiKeyModal?: () => void;
 }
 
 export const LKPDView: React.FC<LKPDViewProps> = ({
@@ -26,6 +28,7 @@ export const LKPDView: React.FC<LKPDViewProps> = ({
   currentTopikRPL,
   currentKelasRPL,
   onShowToast,
+  onOpenApiKeyModal,
 }) => {
   const [topik, setTopik] = useState<string>(
     currentTopikRPL || 'Membangun Pertemanan Sehat & Anti-Bullying'
@@ -79,24 +82,23 @@ export const LKPDView: React.FC<LKPDViewProps> = ({
       return;
     }
 
+    const apiKey = getActiveApiKey();
+    if (!apiKey) {
+      onShowToast('Silakan masukkan Gemini API Key terlebih dahulu di pojok kanan atas.');
+      if (onOpenApiKeyModal) {
+        onOpenApiKeyModal();
+      }
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await fetch('/api/generate-lkpd', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topik, kelas, bidang }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Gagal menghubungi AI');
-      }
-
-      const data = await response.json();
-      setLkpd(data);
-      onShowToast('Lembar Refleksi 4F berhasil disusun secara otomatis!');
+      const generated = await generateLKPDClient({ topik, kelas, bidang });
+      setLkpd(generated);
+      onShowToast('Lembar Refleksi 4F berhasil disusun via Gemini SDK!');
     } catch (err: any) {
-      console.error(err);
-      onShowToast('Gagal memproses AI, menggunakan format standar refleksi');
+      console.error('Error generating LKPD via Client SDK:', err);
+      onShowToast(`Gagal: ${err.message || 'Periksa API Key atau coba lagi'}`);
     } finally {
       setIsLoading(false);
     }

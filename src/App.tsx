@@ -4,16 +4,20 @@ import { DEFAULT_SCHOOL_PROFILE, DEFAULT_RPL } from './data/constants';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { ProfileModal } from './components/ProfileModal';
+import { ApiKeyModal } from './components/ApiKeyModal';
 import { RPLView } from './components/RPLView';
 import { AsesmenView } from './components/AsesmenView';
 import { LKPDView } from './components/LKPDView';
 import { KonsultasiView } from './components/KonsultasiView';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { getActiveApiKey } from './services/geminiClient';
+import { CheckCircle2 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'rpl' | 'asesmen' | 'lkpd' | 'konsultasi'>('rpl');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
+  const [hasApiKey, setHasApiKey] = useState<boolean>(() => Boolean(getActiveApiKey()));
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -40,11 +44,16 @@ export default function App() {
     }
   };
 
+  const handleKeySaved = (key: string) => {
+    setHasApiKey(Boolean(key && key.trim()));
+    showToast(key ? 'Gemini API Key berhasil disimpan dan aktif!' : 'Gemini API Key dihapus');
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 3000);
+    }, 3500);
   };
 
   const handlePrint = () => {
@@ -107,6 +116,8 @@ export default function App() {
           isCopied={isCopied}
           profile={profile}
           onOpenProfile={() => setIsProfileOpen(true)}
+          onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+          hasApiKey={hasApiKey}
         />
 
         <main className="flex-1 pb-16">
@@ -118,6 +129,7 @@ export default function App() {
               searchFilter={searchQuery}
               onNavigateToLKPD={() => setActiveTab('lkpd')}
               onShowToast={showToast}
+              onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
             />
           )}
 
@@ -134,6 +146,7 @@ export default function App() {
               currentTopikRPL={rplData.topik}
               currentKelasRPL={rplData.kelas}
               onShowToast={showToast}
+              onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
             />
           )}
 
@@ -141,6 +154,7 @@ export default function App() {
             <KonsultasiView
               profile={profile}
               onShowToast={showToast}
+              onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
             />
           )}
         </main>
@@ -152,6 +166,13 @@ export default function App() {
         onClose={() => setIsProfileOpen(false)}
         profile={profile}
         onSave={handleSaveProfile}
+      />
+
+      {/* Gemini API Key Modal */}
+      <ApiKeyModal
+        isOpen={isApiKeyModalOpen}
+        onClose={() => setIsApiKeyModalOpen(false)}
+        onKeySaved={handleKeySaved}
       />
 
       {/* Toast Notification (No alert()) */}

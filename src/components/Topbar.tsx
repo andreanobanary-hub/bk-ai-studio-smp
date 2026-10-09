@@ -6,6 +6,7 @@ import {
   School,
   Search,
   Check,
+  Key,
 } from 'lucide-react';
 import { SchoolProfile } from '../types';
 
@@ -18,6 +19,8 @@ interface TopbarProps {
   isCopied: boolean;
   profile: SchoolProfile;
   onOpenProfile: () => void;
+  onOpenApiKeyModal: () => void;
+  hasApiKey: boolean;
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -29,6 +32,8 @@ export const Topbar: React.FC<TopbarProps> = ({
   isCopied,
   profile,
   onOpenProfile,
+  onOpenApiKeyModal,
+  hasApiKey,
 }) => {
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 no-print sticky top-0 z-20">
@@ -57,13 +62,27 @@ export const Topbar: React.FC<TopbarProps> = ({
       </div>
 
       {/* Right Actions & Status */}
-      <div className="flex items-center space-x-3 shrink-0">
-        {/* Gemini Engine Badge */}
-        <div className="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs text-slate-700 font-medium">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-          <span>Gemini 3.8 Flash Active</span>
-        </div>
+      <div className="flex items-center space-x-2.5 shrink-0">
+        {/* Gemini API Key Setting Button */}
+        <button
+          onClick={onOpenApiKeyModal}
+          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+            hasApiKey
+              ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+              : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100 animate-pulse'
+          }`}
+          title="Atur Gemini API Key"
+        >
+          <Key className={`w-3.5 h-3.5 ${hasApiKey ? 'text-blue-600' : 'text-amber-600'}`} />
+          <span className="hidden sm:inline">
+            {hasApiKey ? 'API Key Aktif' : 'Set API Key'}
+          </span>
+          <span
+            className={`w-2 h-2 rounded-full ${
+              hasApiKey ? 'bg-emerald-500' : 'bg-amber-500'
+            }`}
+          />
+        </button>
 
         {/* Copy Document Button */}
         <button
@@ -105,7 +124,7 @@ export const Topbar: React.FC<TopbarProps> = ({
           title="Identitas Sekolah & Guru BK"
         >
           <School className="w-4 h-4 text-blue-600" />
-          <span className="font-medium hidden xl:inline max-w-[140px] truncate">
+          <span className="font-medium hidden xl:inline max-w-[130px] truncate">
             {profile.namaSekolah}
           </span>
         </button>
@@ -113,3 +132,4 @@ export const Topbar: React.FC<TopbarProps> = ({
     </header>
   );
 };
+
