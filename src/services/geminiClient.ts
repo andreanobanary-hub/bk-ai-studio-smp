@@ -29,8 +29,8 @@ function getGeminiClient(): GoogleGenAI {
   return new GoogleGenAI({ apiKey });
 }
 
-// Active Gemini model requested
-export const GEMINI_MODEL = 'gemini-1.5-flash';
+// Active Gemini model requested: gemini-2.5-flash
+export const GEMINI_MODEL = 'gemini-2.5-flash';
 
 // Client-side RPL Generation
 export async function generateRPLClient(params: {
